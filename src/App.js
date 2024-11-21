@@ -1,5 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
+import Navbar from './landing_page/navbar';
 
 function MyButton({my_param}) {
   return (
@@ -11,7 +12,8 @@ function MyButton({my_param}) {
 
 function App() {
   return (
-    <div className="App">
+    <div>
+      <Navbar />
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
