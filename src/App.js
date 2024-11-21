@@ -1,14 +1,22 @@
-import './App.css';
-import Navbar from './landing_page/navbar';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from './pages/Layout';
+import Home from './pages/Home';
+import MinecraftBlocks from './pages/minecraft_blocks';
 
+// This file (and function) is only for adding
+// more routes/webpages
 function App() {
   return (
-    <div className='background_img'>
-      <Navbar />
-      <header className="App-header">
-
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="minecraft" element={<MinecraftBlocks />} />
+          {/* <Route path="<route_name>" element={<Component_In_Pages_Dir />} /> */}
+          {/* ALSO ADD ROUTE TO Navbar DROPDOWN */}
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
