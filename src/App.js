@@ -1,6 +1,14 @@
 import logo from './logo.svg';
 import './App.css';
 
+function MyButton({my_param}) {
+  return (
+    <button>
+      I'm a {my_param}
+    </button>
+  );
+}
+
 function App() {
   return (
     <div className="App">
@@ -17,6 +25,7 @@ function App() {
         >
           Learn React
         </a>
+        <MyButton my_param={"ButtonParam"}/>
       </header>
     </div>
   );
