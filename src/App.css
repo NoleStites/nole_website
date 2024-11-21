@@ -1,3 +1,11 @@
+/* Minecraft block textures: 
+https://minecraft.fandom.com/wiki/List_of_block_textures                 */
+.background_img {
+  background-image: url('./netherrack.webp');
+  background-size: 3%;
+  /* background-repeat: no-repeat; */
+  /* background-size: cover; */
+}
 
 .App-logo {
   height: 40vmin;
@@ -11,7 +19,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  /* background-color: #282c34; */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
