@@ -4,7 +4,6 @@ function MinecraftBlocks() {
     return (
         <div>
             <Navbar />
-            <h1>Julius Caesar</h1>
         </div>
     );
 }
