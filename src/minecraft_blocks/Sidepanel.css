@@ -1,4 +1,4 @@
-/* CODE TAKEN FROM W3SCHOOLS */
+/* MOST CODE TAKEN FROM W3SCHOOLS */
 
 /* The sidebar menu */
 .sidebar {
@@ -62,4 +62,10 @@
   @media screen and (max-height: 450px) {
     .sidebar {padding-top: 15px;}
     .sidebar a {font-size: 18px;}
+  }
+
+  /* CUSTOM CODE */
+  .sidepanel_input_label {
+    color: white;
+    font-size: 20px;
   }

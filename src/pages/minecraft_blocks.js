@@ -1,24 +1,33 @@
 import Navbar from "../navbar/navbar";
 import Sidepanel from "../minecraft_blocks/Sidepanel";
 import '../minecraft_blocks/minecraft_blocks.css'
+import '../minecraft_blocks/Sidepanel.css'
 import { useState, useEffect } from 'react';
 
 function MinecraftBlocks() {
     // State hooks that re-render the necessary components when changed
-    const [num_columns, setColumns] = useState(20);
+    const [num_columns, setColumns] = useState(10);
     const [num_rows, setRows] = useState(10);
     const [texture_size, setTextureSize] = useState(40);
 
     // Helper functions to change the state hooks
     const changeColumns = (new_size) => {
-        setColumns(new_size);
+        let value = document.getElementById('column_input').value;
+        if (value < 1) {
+            return;
+        }
+        setColumns(value);
     }
-    const changeRows = (new_size) => {
-        setRows(new_size);
+    const changeRows = () => {
+        let value = document.getElementById('row_input').value;
+        if (value < 1) {
+            return;
+        }
+        setRows(value);
     }
     const changeTextureSize = () => {
         let value = document.getElementById('texture_size_input').value;
-        if (value < 20) {
+        if (value < 20 || value % 4 != 0) {
             return;
         }
         setTextureSize(value);
@@ -44,27 +53,42 @@ function MinecraftBlocks() {
         return grid;
     }
 
-    let texture_grid = make_flex_grid(num_columns, num_rows, texture_size);
-
-    const temp = () => {
-        let value = document.getElementById('column_input').value;
-        if (value < 1) {
-            return;
-        }
-        console.log(value);
+    /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
+    function openNav() {
+        document.getElementById("mySidebar").style.width = "250px";
+        document.getElementById("main").style.marginLeft = "250px";
     }
+    
+    /* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
+    function closeNav() {
+        document.getElementById("mySidebar").style.width = "0";
+        document.getElementById("main").style.marginLeft = "0";
+    }
+
+    let texture_grid = make_flex_grid(num_columns, num_rows, texture_size);
 
     return (
         <div className="page">
             <Navbar />
-            <Sidepanel />
-            <div id="buttons">
-                <button onClick={() => changeColumns(num_columns+1)}>+Columns</button>
-                <button onClick={() => changeRows(num_rows+1)}>+Rows</button>
-                <input onChange={() => temp()} type="number" id="column_input" min={1} max={1000}></input>
-                {/* Step size below is 4 because the textures are not lined up until the next 4th pixel increase. Odd... */}
-                <input onChange={() => changeTextureSize()} type="number" id="texture_size_input" min={20} max={200} step={4}></input>
+
+            {/* SIDEBAR */}
+            <div id="mySidebar" className="sidebar">
+                <a href="javascript:void(0)" className="closebtn" onClick={closeNav}>&times;</a>
+                <div id="buttons">
+                    <label for="column_input" className="sidepanel_input_label">Column Count: </label>
+                    <input onChange={() => changeColumns(num_columns+1)} id="column_input" type="number" min={1} max={200} placeholder={num_columns}></input><br />
+                    <label for="row_input" className="sidepanel_input_label">Row Count: </label>
+                    <input onChange={() => changeRows(num_rows+1)} id="row_input" type="number" min={1} max={200} placeholder={num_rows}></input><br />
+                    {/* Step size below is 4 because the textures are not lined up until the next 4th pixel increase. Odd... */}
+                    <label for="texture_size_input" className="sidepanel_input_label">Texture Size: </label>
+                    <input onChange={() => changeTextureSize()} type="number" id="texture_size_input" min={20} max={200} step={4} placeholder={texture_size}></input><br />
+                </div>
             </div>
+            <div id="main">
+                <button className="openbtn" onClick={openNav}>&#9776; Open Sidebar</button>
+            </div>  
+            {/* END SIDEBAR */}
+            
             {texture_grid}
         </div>
     );
