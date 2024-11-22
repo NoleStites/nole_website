@@ -1,4 +1,5 @@
 import Navbar from "../navbar/navbar";
+import Sidepanel from "../minecraft_blocks/Sidepanel";
 import '../minecraft_blocks/minecraft_blocks.css'
 import { useState, useEffect } from 'react';
 
@@ -6,7 +7,7 @@ function MinecraftBlocks() {
     // State hooks that re-render the necessary components when changed
     const [num_columns, setColumns] = useState(20);
     const [num_rows, setRows] = useState(10);
-    const [texture_size, setTextureSize] = useState(50);
+    const [texture_size, setTextureSize] = useState(40);
 
     // Helper functions to change the state hooks
     const changeColumns = (new_size) => {
@@ -56,6 +57,7 @@ function MinecraftBlocks() {
     return (
         <div className="page">
             <Navbar />
+            <Sidepanel />
             <div id="buttons">
                 <button onClick={() => changeColumns(num_columns+1)}>+Columns</button>
                 <button onClick={() => changeRows(num_rows+1)}>+Rows</button>
