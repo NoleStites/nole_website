@@ -4,8 +4,8 @@ import '../minecraft_blocks/minecraft_blocks.css'
 import { useState, useEffect } from 'react';
 
 function MinecraftBlocks() {
-    const [num_columns, setColumns] = useState(2);
-    const [num_rows, setRows] = useState(3);
+    const [num_columns, setColumns] = useState(8);
+    const [num_rows, setRows] = useState(2);
 
     // Helper function to change the state
     const changeColumns = (new_size) => {
@@ -18,7 +18,11 @@ function MinecraftBlocks() {
     }
 
     const temp = () => {
-        console.log("Changed!");
+        // console.log("Changed!");
+        let spots = document.getElementsByClassName("grid_spot");
+        console.log(spots);
+        let spot = spots[0];
+        console.log(spot);
     }
 
     return (
