@@ -1,39 +1,23 @@
 .page {
     background-color: rgb(29, 29, 29);
-    height: 100vh;
+    min-height: 100vh;
+    height: fit-content;
 }
 
-/* #buttons {
-    position: absolute;
-} */
-
-table {
-    width: 100vw;
-    /* height: 75%; */
-    border-spacing: 0px;
+.flexbox {
+    width: 100%;
+    height: fit-content;
+    background-color: rgba(255, 181, 181, 0.238);
+    display: flex;
+    justify-content: flex-end;
 }
 
-td {
-    /* aspect-ratio: 1/1; */
-    border: 1px solid red;
-    background-repeat: no-repeat;
-    background-size: contain;
-    height: auto;
-}
-
-.grid_spot {
-    background-image: url("./textures/Block_of_Iron.webp");
-}
-
-/* td#t1 {
-    background-image: url("./textures/Block_of_Iron.webp");
-}
-td#t2 {
+.texture_box {
+    /* border: 1px solid blue; */
     background-image: url("./textures/Block_of_Gold.webp");
+    background-size: contain;
 }
-td#t3 {
-    background-image: url("./textures/Block_of_Emerald.webp");
+
+#buttons {
+    position: absolute;
 }
-td#t4 {
-    background-image: url("./textures/Block_of_Lapis_Lazuli.webp");
-} */
