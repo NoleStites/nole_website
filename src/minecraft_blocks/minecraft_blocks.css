@@ -7,7 +7,7 @@
 .flexbox {
     width: 100%;
     height: fit-content;
-    background-color: rgba(255, 181, 181, 0.238);
+    /* background-color: rgba(255, 181, 181, 0.238); */
     display: flex;
     justify-content: flex-end;
 }
