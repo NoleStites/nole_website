@@ -1,0 +1,34 @@
+.page {
+    background-color: rgb(29, 29, 29);
+    height: 100vh;
+}
+
+#buttons {
+    /* position: absolute; */
+}
+
+table {
+    width: 100%;
+    height: 75%;
+    border-spacing: 0px;
+}
+
+td {
+    /* aspect-ratio: 1/1; */
+    border: 1px solid red;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* td#t1 {
+    background-image: url("./textures/Block_of_Iron.webp");
+}
+td#t2 {
+    background-image: url("./textures/Block_of_Gold.webp");
+}
+td#t3 {
+    background-image: url("./textures/Block_of_Emerald.webp");
+}
+td#t4 {
+    background-image: url("./textures/Block_of_Lapis_Lazuli.webp");
+} */
