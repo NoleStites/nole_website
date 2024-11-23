@@ -91,6 +91,87 @@ function MinecraftBlocks() {
         'wood': importAll(require.context('../minecraft_blocks/textures/wood', false, /\.(png|jpe?g|svg|webp)$/)),
     }; // Key is texture_type string, value is dict mapping file names to url
 
+    // 'name' is in the following format: 'Bone_Block.webp'
+    const texture_selected = (name) => {
+        let check_id = name+'_check';
+        let check_obj = document.getElementById(check_id);
+        let isChecked = check_obj.checked;
+
+        let texture_obj = document.getElementById(name);
+        if (isChecked) {
+            texture_obj.style.backgroundColor = 'green';
+        } else {
+            texture_obj.style.backgroundColor = 'rgb(29, 29, 29)';
+        }
+    }
+
+    var selection = {} // Key: 'Bone_Block.webp'; Value: URL
+
+    // Helper to remove items from selection dictionary
+    function remove_selection(box_id) {
+        // Uncheck the box
+        let check_id = box_id+'_check';
+        let check = document.getElementById(check_id);
+        check.checked = false;
+
+        // Remove the green background color
+        let box = document.getElementById(box_id);
+        box.style.backgroundColor = 'rgb(29, 29, 29)';
+
+        console.log("Deleting: ", box_id);
+        delete selection[box_id];
+        // console.log(selection);
+    }
+
+    // Helper to add items to selection dictionary
+    const add_selection = (box_id) => {
+        let box = document.getElementById(box_id);
+        let text_type = box.classList[1]; // 'animal', 'stone', etc.
+        let url = textures[text_type][box_id];
+
+        selection[box_id] = url;
+
+        let check_id = box_id+'_check';
+        let check_obj = document.getElementById(check_id);
+        check_obj.checked = true;
+        box.style.backgroundColor = 'green';
+        // console.log(selection);
+    }
+
+    const handle_selection = (box_id) => {
+        let check_id = box_id+'_check';
+        let check_obj = document.getElementById(check_id);
+        let isChecked = check_obj.checked;
+
+        if (isChecked) {
+            add_selection(box_id);
+        } else {
+            remove_selection(box_id);
+        }
+    }
+
+    const clear_texture_selections = () => {
+        let check_boxes = document.getElementsByClassName('texture_checks');
+        for (let i = 0; i < check_boxes.length; i++) {
+            let curr_check = check_boxes[i];
+            if (curr_check.checked) {
+                let box_id = curr_check.id.split('_check')[0];
+                remove_selection(box_id);
+            }
+        }
+    }
+
+    const select_all_textures = () => {
+        let check_boxes = document.getElementsByClassName('texture_checks');
+        for (let i = 0; i < check_boxes.length; i++) {
+            let curr_check = check_boxes[i];
+            if (!curr_check.checked) {
+                let box_id = curr_check.id.split('_check')[0];
+                add_selection(box_id);
+            }
+        }
+    }
+
     // Return the HTML for the given texture type section
     function make_texture_grid(texture_type) {
         let curr_t = textures[texture_type];
@@ -98,7 +179,11 @@ function MinecraftBlocks() {
         let formatted_string = texture_type[0].toUpperCase() + texture_type.substring(1, texture_type.length);
         let grid = [<h3 key={-1} className="texture_section_title">{formatted_string}</h3>];
         for (let i = 0; i < texture_names.length; i++) {
-            grid.push(<div key={i} className="texture_checkbox" style={{ 'backgroundImage': `url(${curr_t[texture_names[i]]})` }}></div>);
+            let check_id = texture_names[i]+'_check';
+            let class_name = "texture_checkbox " + texture_type; 
+            grid.push(<div key={i} id={texture_names[i]} className={class_name} style={{ 'backgroundImage': `url(${curr_t[texture_names[i]]})` }}>
+                <input className='texture_checks' id={check_id} type="checkbox" onChange={() => handle_selection(texture_names[i])}></input>
+            </div>);
         }
         return grid;
     }
@@ -119,7 +204,13 @@ function MinecraftBlocks() {
     A list of textures chosen by the user. Each texture is represented by a 
     string of the filename (ex: 'Block_of_Emerald.webp') which doubles as the
     key to use to access the texture in the 'textures' dict. */
-    const generate = (chosen_textures) => {
+    const generate = () => {
+        let chosen_textures = Object.keys(selection);
+        
+        if (chosen_textures.length === 0) {
+            return; // No textures chosen
+        }
+
         // First, remove borders from each grid_spot
         let boxes = document.getElementsByClassName('texture_box');
         if (speed > 0) { // Only for non-instant generation
@@ -145,7 +236,8 @@ function MinecraftBlocks() {
                 // Choose a random texture from the given list of textures
                 let random_index = Math.floor(Math.random() * num_textures);
                 let random_texture = chosen_textures[random_index];
-                diagonal_spot.style.backgroundImage = `url(${textures[random_texture]})`;
+                // diagonal_spot.style.backgroundImage = `url(${textures[random_texture]})`;
+                diagonal_spot.style.backgroundImage = `url(${selection[random_texture]})`;
                 diagonal_spot.style.backgroundSize = '100%';
             }
             }, i*speed);
@@ -172,10 +264,12 @@ function MinecraftBlocks() {
                     <input onChange={() => changeTextureSize()} type="number" id="texture_size_input" min={20} max={200} step={4} placeholder={texture_size}></input><br />
                     <label htmlFor="speed_input" className="sidepanel_input_label">Generation Speed: </label>
                     <input onChange={() => changeSpeed()} type="range" id="speed_input" min={0} max={500} step={10} value={speed}></input><br />
-                    {/* <button onClick={() => generate(['Block_of_Emerald.webp'])}>Generate</button> */}
+                    <button onClick={() => generate()}>Generate</button>
                 </div>
                 <div id="texture_section">
                     <div id="texture_flex">
+                        <button onClick={() => clear_texture_selections()}>Clear Selection</button>
+                        <button onClick={() => select_all_textures()}>Select All</button>
                         {texture_panel} {/* This represents ALL textures */}
                     </div>
                 </div>
