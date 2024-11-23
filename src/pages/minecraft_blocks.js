@@ -60,8 +60,8 @@ function MinecraftBlocks() {
 
     /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
     function openNav() {
-        document.getElementById("mySidebar").style.width = "250px";
-        document.getElementById("main").style.marginLeft = "250px";
+        document.getElementById("mySidebar").style.width = "350px";
+        document.getElementById("main").style.marginLeft = "350px";
     }
     
     /* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
@@ -78,8 +78,16 @@ function MinecraftBlocks() {
         return textures;
     }
 
-    var textures = importAll(require.context('../minecraft_blocks/textures', false, /\.(png|jpe?g|svg|webp)$/));
+    var textures = importAll(require.context('../minecraft_blocks/textures/sediment', false, /\.(png|jpe?g|svg|webp)$/));
     let texture_names = Object.keys(textures);
+
+    function make_texture_grid() {
+        let grid = [];
+        for (let i = 0; i < texture_names.length; i++) {
+            grid.push(<div className="texture_checkbox" style={{ 'backgroundImage': `url(${textures[texture_names[i]]})` }}></div>);
+        }
+        return grid;
+    }
 
     /* This function loops through the grid and assigns a random texture to each spot.
 
@@ -90,12 +98,14 @@ function MinecraftBlocks() {
     const generate = (chosen_textures) => {
         // First, remove borders from each grid_spot
         let boxes = document.getElementsByClassName('texture_box');
-        for (let i = 0; i < boxes.length; i++) {
-            let curr_box = boxes[i];
-            curr_box.style.backgroundImage = 'none';
-            curr_box.style.boxShadow = '0px 0px rgba(0,0,0,0)';
-            curr_box.style.backgroundColor = 'rgb(29, 29, 29)';
-            curr_box.style.backgroundSize = '0%';
+        if (speed > 0) { // Only for non-instant generation
+            for (let i = 0; i < boxes.length; i++) {
+                let curr_box = boxes[i];
+                curr_box.style.backgroundImage = 'none';
+                curr_box.style.boxShadow = '0px 0px rgba(0,0,0,0)';
+                curr_box.style.backgroundColor = 'rgb(29, 29, 29)';
+                curr_box.style.backgroundSize = '0%';
+            }
         }
 
         let num_textures = chosen_textures.length;
@@ -119,6 +129,7 @@ function MinecraftBlocks() {
     }
 
     let texture_grid = make_flex_grid(num_columns, num_rows, texture_size);
+    let texture_panel = make_texture_grid();
 
     return (
         <div className="page">
@@ -138,6 +149,12 @@ function MinecraftBlocks() {
                     <label htmlFor="speed_input" className="sidepanel_input_label">Generation Speed: </label>
                     <input onChange={() => changeSpeed()} type="range" id="speed_input" min={0} max={500} step={10} value={speed}></input><br />
                     <button onClick={() => generate(texture_names)}>Generate</button>
+                </div>
+                <div id="texture_section">
+                    <h3 className="texture_section_title">Sediment</h3>
+                    <div id="texture_flex">
+                        {texture_panel}
+                    </div>
                 </div>
             </div>
             <div id="main">

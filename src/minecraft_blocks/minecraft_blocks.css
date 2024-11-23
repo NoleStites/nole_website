@@ -21,3 +21,48 @@
     background-repeat: no-repeat;
     background-position: center center;
 }
+
+#buttons {
+    height: fit-content;
+}
+
+#texture_section {
+    /* background-color: rgba(255, 0, 0, 0.36); */
+    margin-top: 15px;
+    border-top: 1px solid grey;
+    width: 100%;
+    height: 70%;
+    overflow-y: auto;
+}
+
+#texture_flex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    height: fit-content;
+}
+
+.texture_checkbox {
+    width: 60px;
+    height: 60px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 70%;
+    border: 2px inset rgba(136, 136, 136, 0.5);
+    border-radius: 15px;
+}
+
+.texture_checkbox:hover {
+    background-color: rgb(255, 230, 0);
+}
+
+.texture_section_title {
+    text-decoration: underline;
+    color: white;
+    margin: 0px;
+    margin-bottom: 5px;
+    width: 100%;
+    text-align: center;
+}
