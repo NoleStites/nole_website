@@ -1,7 +1,7 @@
 import Navbar from "../navbar/navbar";
 import Sidepanel from "../minecraft_blocks/Sidepanel";
-import '../minecraft_blocks/minecraft_blocks.css'
-import '../minecraft_blocks/Sidepanel.css'
+import '../minecraft_blocks/minecraft_blocks.css';
+import '../minecraft_blocks/Sidepanel.css';
 import { useState, useEffect } from 'react';
 
 function MinecraftBlocks() {
@@ -46,7 +46,7 @@ function MinecraftBlocks() {
         for (let i = 0; i < rows; i++) {
             let row = [];
             for (let j = 0; j < columns; j++) {
-                row.push(<div key={j} className="texture_box" style={spot_styles}></div>);
+                row.push(<div key={j} className={`texture_box diagonal_${j+i}`} style={spot_styles}></div>);
             }
             grid.push(<div key={i} className="flexbox">{row}</div>);
         }
@@ -65,6 +65,49 @@ function MinecraftBlocks() {
         document.getElementById("main").style.marginLeft = "0";
     }
 
+    // Import all textures and store the media in a 'textures' dictionary
+    // Where the key is the file name (ex: 'Block_of_Emerald.webp').
+    function importAll(r) {
+        let textures = {};
+        r.keys().map((item, index) => { textures[item.replace('./', '')] = r(item); });
+        return textures;
+    }
+
+    var textures = importAll(require.context('../minecraft_blocks/textures', false, /\.(png|jpe?g|svg|webp)$/));
+    let texture_names = Object.keys(textures);
+
+    /* This function loops through the grid and assigns a random texture to each spot.
+
+    PARAMS: chosen_textures
+    A list of textures chosen by the user. Each texture is represented by a 
+    string of the filename (ex: 'Block_of_Emerald.webp') which doubles as the
+    key to use to access the texture in the 'textures' dict. */
+    const generate = (chosen_textures) => {
+        // First, remove borders from each grid_spot
+        let boxes = document.getElementsByClassName('texture_box');
+        for (let i = 0; i < boxes.length; i++) {
+            let curr_box = boxes[i];
+            curr_box.style.boxShadow = '0px 0px rgba(0,0,0,0)';
+            curr_box.style.backgroundColor = 'rgb(29, 29, 29)';
+        }
+
+        let num_textures = chosen_textures.length;
+        let num_diagonals = num_columns + num_rows - 1;
+
+        // Loop through each diagonal to generate textures with time delay
+        for (let i = 0; i < num_diagonals; i++) {
+            let curr_diagonal = document.getElementsByClassName("diagonal_"+i);
+            // Loop through each grid_spot in the current diagonal and assign texture
+            for (let j = 0; j < curr_diagonal.length; j++) {
+                let diagonal_spot = curr_diagonal[j];
+                // Choose a random texture from the given list of textures
+                let random_index = Math.floor(Math.random() * num_textures);
+                let random_texture = chosen_textures[random_index];
+                diagonal_spot.style.backgroundImage = `url(${textures[random_texture]})`;
+            }
+        }
+    }
+
     let texture_grid = make_flex_grid(num_columns, num_rows, texture_size);
 
     return (
@@ -75,13 +118,14 @@ function MinecraftBlocks() {
             <div id="mySidebar" className="sidebar">
                 <a href="javascript:void(0)" className="closebtn" onClick={closeNav}>&times;</a>
                 <div id="buttons">
-                    <label for="column_input" className="sidepanel_input_label">Column Count: </label>
+                    <label htmlFor="column_input" className="sidepanel_input_label">Column Count: </label>
                     <input onChange={() => changeColumns(num_columns+1)} id="column_input" type="number" min={1} max={200} placeholder={num_columns}></input><br />
-                    <label for="row_input" className="sidepanel_input_label">Row Count: </label>
+                    <label htmlFor="row_input" className="sidepanel_input_label">Row Count: </label>
                     <input onChange={() => changeRows(num_rows+1)} id="row_input" type="number" min={1} max={200} placeholder={num_rows}></input><br />
                     {/* Step size below is 4 because the textures are not lined up until the next 4th pixel increase. Odd... */}
-                    <label for="texture_size_input" className="sidepanel_input_label">Texture Size: </label>
+                    <label htmlFor="texture_size_input" className="sidepanel_input_label">Texture Size: </label>
                     <input onChange={() => changeTextureSize()} type="number" id="texture_size_input" min={20} max={200} step={4} placeholder={texture_size}></input><br />
+                    <button onClick={() => generate(texture_names)}>Generate</button>
                 </div>
             </div>
             <div id="main">
