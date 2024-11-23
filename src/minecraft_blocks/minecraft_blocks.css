@@ -16,4 +16,8 @@
     background-size: contain;
     background-color: rgb(195, 195, 195);
     transition: background-color 0.5s;
+    transition: background-size 0.5s;
+    background-size: 0%;
+    background-repeat: no-repeat;
+    background-position: center center;
 }

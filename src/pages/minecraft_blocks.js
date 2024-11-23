@@ -92,8 +92,10 @@ function MinecraftBlocks() {
         let boxes = document.getElementsByClassName('texture_box');
         for (let i = 0; i < boxes.length; i++) {
             let curr_box = boxes[i];
+            curr_box.style.backgroundImage = 'none';
             curr_box.style.boxShadow = '0px 0px rgba(0,0,0,0)';
             curr_box.style.backgroundColor = 'rgb(29, 29, 29)';
+            curr_box.style.backgroundSize = '0%';
         }
 
         let num_textures = chosen_textures.length;
@@ -110,6 +112,7 @@ function MinecraftBlocks() {
                 let random_index = Math.floor(Math.random() * num_textures);
                 let random_texture = chosen_textures[random_index];
                 diagonal_spot.style.backgroundImage = `url(${textures[random_texture]})`;
+                diagonal_spot.style.backgroundSize = '100%';
             }
             }, i*speed);
         }
