@@ -78,13 +78,37 @@ function MinecraftBlocks() {
         return textures;
     }
 
-    var textures = importAll(require.context('../minecraft_blocks/textures/sediment', false, /\.(png|jpe?g|svg|webp)$/));
-    let texture_names = Object.keys(textures);
+    var texture_types = ['animal', 'building', 'ore', 'plant', 'redstone', 'sediment', 'stone', 'utility', 'wood'];
+    var textures = {
+        'animal': importAll(require.context('../minecraft_blocks/textures/animal', false, /\.(png|jpe?g|svg|webp)$/)),
+        'building': importAll(require.context('../minecraft_blocks/textures/building', false, /\.(png|jpe?g|svg|webp)$/)),
+        'ore': importAll(require.context('../minecraft_blocks/textures/ore', false, /\.(png|jpe?g|svg|webp)$/)),
+        'plant': importAll(require.context('../minecraft_blocks/textures/plant', false, /\.(png|jpe?g|svg|webp)$/)),
+        'redstone': importAll(require.context('../minecraft_blocks/textures/redstone', false, /\.(png|jpe?g|svg|webp)$/)),
+        'sediment': importAll(require.context('../minecraft_blocks/textures/sediment', false, /\.(png|jpe?g|svg|webp)$/)),
+        'stone': importAll(require.context('../minecraft_blocks/textures/stone', false, /\.(png|jpe?g|svg|webp)$/)),
+        'utility': importAll(require.context('../minecraft_blocks/textures/utility', false, /\.(png|jpe?g|svg|webp)$/)),
+        'wood': importAll(require.context('../minecraft_blocks/textures/wood', false, /\.(png|jpe?g|svg|webp)$/)),
+    }; // Key is texture_type string, value is dict mapping file names to url
 
-    function make_texture_grid() {
-        let grid = [];
+    // Return the HTML for the given texture type section
+    function make_texture_grid(texture_type) {
+        let curr_t = textures[texture_type];
+        let texture_names = Object.keys(curr_t);
+        let formatted_string = texture_type[0].toUpperCase() + texture_type.substring(1, texture_type.length);
+        let grid = [<h3 key={-1} className="texture_section_title">{formatted_string}</h3>];
         for (let i = 0; i < texture_names.length; i++) {
-            grid.push(<div className="texture_checkbox" style={{ 'backgroundImage': `url(${textures[texture_names[i]]})` }}></div>);
+            grid.push(<div key={i} className="texture_checkbox" style={{ 'backgroundImage': `url(${curr_t[texture_names[i]]})` }}></div>);
+        }
+        return grid;
+    }
+
+    // Returns HTML for all texture type sections
+    function make_grids(texture_type_names) {
+        let grid = [];
+        for (let i = 0; i < texture_type_names.length; i++) {
+            let curr_type = texture_type_names[i];
+            grid.push(make_texture_grid(curr_type));
         }
         return grid;
     }
@@ -129,7 +153,7 @@ function MinecraftBlocks() {
     }
 
     let texture_grid = make_flex_grid(num_columns, num_rows, texture_size);
-    let texture_panel = make_texture_grid();
+    let texture_panel = make_grids(texture_types); // Returns HTML for all texture sections
 
     return (
         <div className="page">
@@ -148,12 +172,11 @@ function MinecraftBlocks() {
                     <input onChange={() => changeTextureSize()} type="number" id="texture_size_input" min={20} max={200} step={4} placeholder={texture_size}></input><br />
                     <label htmlFor="speed_input" className="sidepanel_input_label">Generation Speed: </label>
                     <input onChange={() => changeSpeed()} type="range" id="speed_input" min={0} max={500} step={10} value={speed}></input><br />
-                    <button onClick={() => generate(texture_names)}>Generate</button>
+                    {/* <button onClick={() => generate(['Block_of_Emerald.webp'])}>Generate</button> */}
                 </div>
                 <div id="texture_section">
-                    <h3 className="texture_section_title">Sediment</h3>
                     <div id="texture_flex">
-                        {texture_panel}
+                        {texture_panel} {/* This represents ALL textures */}
                     </div>
                 </div>
             </div>
