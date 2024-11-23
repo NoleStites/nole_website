@@ -12,12 +12,8 @@
 }
 
 .texture_box {
-    box-shadow: 0px 0px 0px 1px rgb(29, 29, 29) inset;
+    box-shadow: 0px 0px 0px 3px rgb(29, 29, 29) inset;
     background-size: contain;
-    background-color: black;
+    background-color: rgb(195, 195, 195);
     transition: background-color 0.5s;
-}
-
-.diagonal_4 {
-    /* background-image: url("./textures/Block_of_Lapis_Lazuli.webp"); */
 }

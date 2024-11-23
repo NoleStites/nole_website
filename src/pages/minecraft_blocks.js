@@ -1,14 +1,14 @@
 import Navbar from "../navbar/navbar";
-import Sidepanel from "../minecraft_blocks/Sidepanel";
 import '../minecraft_blocks/minecraft_blocks.css';
 import '../minecraft_blocks/Sidepanel.css';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 function MinecraftBlocks() {
     // State hooks that re-render the necessary components when changed
     const [num_columns, setColumns] = useState(10);
     const [num_rows, setRows] = useState(10);
     const [texture_size, setTextureSize] = useState(40);
+    const [speed, setSpeed] = useState(100);
 
     // Helper functions to change the state hooks
     const changeColumns = (new_size) => {
@@ -27,10 +27,15 @@ function MinecraftBlocks() {
     }
     const changeTextureSize = () => {
         let value = document.getElementById('texture_size_input').value;
-        if (value < 20 || value % 4 != 0) {
+        if (value < 20 || value % 4 !== 0) {
             return;
         }
         setTextureSize(value);
+    }
+
+    const changeSpeed = () => {
+        let value = document.getElementById('speed_input').value;
+        setSpeed(value);
     }
 
     // Makes a flex object for each row, populated with 'columns'
@@ -98,6 +103,7 @@ function MinecraftBlocks() {
         for (let i = 0; i < num_diagonals; i++) {
             let curr_diagonal = document.getElementsByClassName("diagonal_"+i);
             // Loop through each grid_spot in the current diagonal and assign texture
+            setTimeout(() => {
             for (let j = 0; j < curr_diagonal.length; j++) {
                 let diagonal_spot = curr_diagonal[j];
                 // Choose a random texture from the given list of textures
@@ -105,6 +111,7 @@ function MinecraftBlocks() {
                 let random_texture = chosen_textures[random_index];
                 diagonal_spot.style.backgroundImage = `url(${textures[random_texture]})`;
             }
+            }, i*speed);
         }
     }
 
@@ -125,6 +132,8 @@ function MinecraftBlocks() {
                     {/* Step size below is 4 because the textures are not lined up until the next 4th pixel increase. Odd... */}
                     <label htmlFor="texture_size_input" className="sidepanel_input_label">Texture Size: </label>
                     <input onChange={() => changeTextureSize()} type="number" id="texture_size_input" min={20} max={200} step={4} placeholder={texture_size}></input><br />
+                    <label htmlFor="speed_input" className="sidepanel_input_label">Generation Speed: </label>
+                    <input onChange={() => changeSpeed()} type="range" id="speed_input" min={0} max={500} step={10} value={speed}></input><br />
                     <button onClick={() => generate(texture_names)}>Generate</button>
                 </div>
             </div>
