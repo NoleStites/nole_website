@@ -9,6 +9,7 @@ function MinecraftBlocks() {
     const [num_rows, setRows] = useState(10);
     const [texture_size, setTextureSize] = useState(40);
     const [speed, setSpeed] = useState(100);
+    const [selection, setSelection] = useState({});
 
     // Helper functions to change the state hooks
     const changeColumns = (new_size) => {
@@ -91,22 +92,6 @@ function MinecraftBlocks() {
         'wood': importAll(require.context('../minecraft_blocks/textures/wood', false, /\.(png|jpe?g|svg|webp)$/)),
     }; // Key is texture_type string, value is dict mapping file names to url
 
-    // 'name' is in the following format: 'Bone_Block.webp'
-    const texture_selected = (name) => {
-        let check_id = name+'_check';
-        let check_obj = document.getElementById(check_id);
-        let isChecked = check_obj.checked;
-
-        let texture_obj = document.getElementById(name);
-        if (isChecked) {
-            texture_obj.style.backgroundColor = 'green';
-        } else {
-            texture_obj.style.backgroundColor = 'rgb(29, 29, 29)';
-        }
-    }
-
-    var selection = {} // Key: 'Bone_Block.webp'; Value: URL
-
     // Helper to remove items from selection dictionary
     function remove_selection(box_id) {
         // Uncheck the box
@@ -118,8 +103,10 @@ function MinecraftBlocks() {
         let box = document.getElementById(box_id);
         box.style.backgroundColor = 'rgb(29, 29, 29)';
 
-        console.log("Deleting: ", box_id);
-        delete selection[box_id];
+        let temp_dict = selection;
+        delete temp_dict[box_id];
+
+        setSelection(temp_dict);
         // console.log(selection);
     }
 
@@ -129,7 +116,7 @@ function MinecraftBlocks() {
         let text_type = box.classList[1]; // 'animal', 'stone', etc.
         let url = textures[text_type][box_id];
 
-        selection[box_id] = url;
+        setSelection((prevSelections) => ({ ...prevSelections, [box_id]: url }));
 
         let check_id = box_id+'_check';
         let check_obj = document.getElementById(check_id);
@@ -206,6 +193,7 @@ function MinecraftBlocks() {
     key to use to access the texture in the 'textures' dict. */
     const generate = () => {
         let chosen_textures = Object.keys(selection);
+        // console.log(chosen_textures);
         
         if (chosen_textures.length === 0) {
             return; // No textures chosen
@@ -236,7 +224,6 @@ function MinecraftBlocks() {
                 // Choose a random texture from the given list of textures
                 let random_index = Math.floor(Math.random() * num_textures);
                 let random_texture = chosen_textures[random_index];
-                // diagonal_spot.style.backgroundImage = `url(${textures[random_texture]})`;
                 diagonal_spot.style.backgroundImage = `url(${selection[random_texture]})`;
                 diagonal_spot.style.backgroundSize = '100%';
             }
@@ -265,6 +252,7 @@ function MinecraftBlocks() {
                     <label htmlFor="speed_input" className="sidepanel_input_label">Generation Speed: </label>
                     <input onChange={() => changeSpeed()} type="range" id="speed_input" min={0} max={500} step={10} value={speed}></input><br />
                     <button onClick={() => generate()}>Generate</button>
+                    {/* <button onClick={() => clear_screen()}>Clear Screen</button> */}
                 </div>
                 <div id="texture_section">
                     <div id="texture_flex">
