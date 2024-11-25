@@ -4,33 +4,38 @@ import '../minecraft_blocks/Sidepanel.css';
 import { useState } from 'react';
 
 function MinecraftBlocks() {
+    let intial_texture_size = 72;
+    let initial_rows_cols = calc_num_texture_spots(intial_texture_size);
+
     // State hooks that re-render the necessary components when changed
-    const [num_columns, setColumns] = useState(10);
-    const [num_rows, setRows] = useState(10);
-    const [texture_size, setTextureSize] = useState(40);
+    // * num_columns and num_rows are not changes directly, but dynamically through texture_size *
+    const [num_columns, setColumns] = useState(initial_rows_cols['columns']);
+    const [num_rows, setRows] = useState(initial_rows_cols['rows']);
+    const [texture_size, setTextureSize] = useState(intial_texture_size);
     const [speed, setSpeed] = useState(100);
     const [selection, setSelection] = useState({});
 
-    // Helper functions to change the state hooks
-    const changeColumns = (new_size) => {
-        let value = document.getElementById('column_input').value;
-        if (value < 1) {
-            return;
-        }
-        setColumns(value);
-    }
-    const changeRows = () => {
-        let value = document.getElementById('row_input').value;
-        if (value < 1) {
-            return;
-        }
-        setRows(value);
+    // A helper function for 'changeTextureSize' and initial grid setup for state hook values
+    function calc_num_texture_spots(texture_dimension) {
+        let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+        let vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+
+        let columns = Math.ceil(vw / texture_dimension);
+        let rows = Math.ceil(vh / texture_dimension);
+
+        return {'columns':columns, 'rows':rows};
     }
     const changeTextureSize = () => {
         let value = document.getElementById('texture_size_input').value;
         if (value < 20 || value % 4 !== 0) {
             return;
         }
+
+        // Automatically adjust column and rows to fit screen
+        let num_cols_rows = calc_num_texture_spots(value); // Calculate how many texture spots can fit on the screen
+        setColumns(num_cols_rows['columns']);
+        setRows(num_cols_rows['rows']);
+
         setTextureSize(value);
     }
 
@@ -242,13 +247,9 @@ function MinecraftBlocks() {
             <div id="mySidebar" className="sidebar">
                 <a href="javascript:void(0)" className="closebtn" onClick={closeNav}>&times;</a>
                 <div id="buttons">
-                    <label htmlFor="column_input" className="sidepanel_input_label">Column Count: </label>
-                    <input onChange={() => changeColumns(num_columns+1)} id="column_input" type="number" min={1} max={200} placeholder={num_columns}></input><br />
-                    <label htmlFor="row_input" className="sidepanel_input_label">Row Count: </label>
-                    <input onChange={() => changeRows(num_rows+1)} id="row_input" type="number" min={1} max={200} placeholder={num_rows}></input><br />
                     {/* Step size below is 4 because the textures are not lined up until the next 4th pixel increase. Odd... */}
                     <label htmlFor="texture_size_input" className="sidepanel_input_label">Texture Size: </label>
-                    <input onChange={() => changeTextureSize()} type="number" id="texture_size_input" min={20} max={200} step={4} placeholder={texture_size}></input><br />
+                    <input onChange={() => changeTextureSize()} type="number" id="texture_size_input" min={20} max={200} step={4} placeholder={texture_size} value={texture_size}></input><br />
                     <label htmlFor="speed_input" className="sidepanel_input_label">Generation Speed: </label>
                     <input onChange={() => changeSpeed()} type="range" id="speed_input" min={0} max={500} step={10} value={speed}></input><br />
                     <button onClick={() => generate()}>Generate</button>
