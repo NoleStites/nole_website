@@ -198,7 +198,6 @@ function MinecraftBlocks() {
     key to use to access the texture in the 'textures' dict. */
     const generate = () => {
         let chosen_textures = Object.keys(selection);
-        // console.log(chosen_textures);
         
         if (chosen_textures.length === 0) {
             return; // No textures chosen
@@ -211,7 +210,7 @@ function MinecraftBlocks() {
                 let curr_box = boxes[i];
                 curr_box.style.backgroundImage = 'none';
                 curr_box.style.boxShadow = '0px 0px rgba(0,0,0,0)';
-                curr_box.style.backgroundColor = 'rgb(29, 29, 29)';
+                // curr_box.style.backgroundColor = 'rgb(29, 29, 29)';
                 curr_box.style.backgroundSize = '0%';
             }
         }
@@ -252,19 +251,21 @@ function MinecraftBlocks() {
                     <input onChange={() => changeTextureSize()} type="number" id="texture_size_input" min={20} max={200} step={4} placeholder={texture_size} value={texture_size}></input><br />
                     <label htmlFor="speed_input" className="sidepanel_input_label">Generation Speed: </label>
                     <input onChange={() => changeSpeed()} type="range" id="speed_input" min={0} max={500} step={10} value={speed}></input><br />
-                    <button onClick={() => generate()}>Generate</button>
                     {/* <button onClick={() => clear_screen()}>Clear Screen</button> */}
+                    <div className="selection_buttons">
+                        <button className="selection_button" onClick={() => clear_texture_selections()}>Clear Selection</button>
+                        <button className="selection_button" onClick={() => select_all_textures()}>Select All</button>
+                        <button className="selection_button" onClick={() => generate()}>Generate</button>
+                    </div>
                 </div>
                 <div id="texture_section">
                     <div id="texture_flex">
-                        <button onClick={() => clear_texture_selections()}>Clear Selection</button>
-                        <button onClick={() => select_all_textures()}>Select All</button>
                         {texture_panel} {/* This represents ALL textures */}
                     </div>
                 </div>
             </div>
             <div id="main">
-                <button className="openbtn" onClick={openNav}>&#9776; Open Sidebar</button>
+                <button className="openbtn" onClick={openNav}>&#9776; View Textures</button>
             </div>  
             {/* END SIDEBAR */}
             

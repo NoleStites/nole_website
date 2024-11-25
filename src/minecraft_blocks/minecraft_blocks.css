@@ -12,10 +12,8 @@
 }
 
 .texture_box {
-    box-shadow: 0px 0px 0px 3px rgb(29, 29, 29) inset;
+    box-shadow: 0px 0px 0px 1px rgb(102, 102, 102) inset;
     background-size: contain;
-    background-color: rgb(195, 195, 195);
-    transition: background-color 0.5s;
     transition: background-size 0.5s;
     background-size: 0%;
     background-repeat: no-repeat;
@@ -27,9 +25,6 @@
 }
 
 #texture_section {
-    /* background-color: rgba(255, 0, 0, 0.36); */
-    margin-top: 15px;
-    border-top: 1px solid grey;
     width: 100%;
     height: 70%;
     overflow-y: auto;
@@ -75,4 +70,36 @@
     height: 100%;
     margin: 0px auto;
     opacity: 0;
+}
+
+.selection_buttons {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 15px;
+    padding: 5px;
+    border-top: 1px solid grey;
+    border-bottom: 1px solid grey;
+}
+
+.selection_button {
+    background-color: rgb(205, 205, 205);
+    font-size: 13pt;
+    padding: 5px;
+    border-radius: 10px;
+}
+.selection_button:hover {
+    background-color: rgb(170, 170, 170);
+}
+
+#texture_size_input {
+    height: 30px;
+    width: 40px;
+    font-size: 12pt;
+    border-radius: 10px;   
+    text-align: center;
+    background-color: rgb(205, 205, 205);
+}
+
+#speed_input {
+    accent-color: green;
 }
