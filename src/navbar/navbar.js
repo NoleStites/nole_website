@@ -1,5 +1,5 @@
 import './navbar.css';
-import { Outlet, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function NavItem({ name, route }) {
     return (
@@ -26,7 +26,7 @@ function NavList ({ name, dropdown }) {
             <div className='dropdown_content'>
                 {
                     Object.entries(dropdown)
-                    .map( ([item_name, url]) => <Link to={url}><p className='dropdown_item'>{item_name}</p></Link> )
+                    .map( ([item_name, url]) => <Link to={url} key={url}><p className='dropdown_item'>{item_name}</p></Link> )
                 }
             </div>
         </div>
