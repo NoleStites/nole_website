@@ -1,8 +1,7 @@
 /* Minecraft block textures: 
 https://minecraft.fandom.com/wiki/List_of_block_textures */
 .background_img {
-  background-image: url('obsidian.webp');
-  background-size: 4%;
+  background-color: rgb(53, 53, 53);
 }
 
 .App-header {
