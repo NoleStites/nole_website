@@ -244,7 +244,7 @@ function MinecraftBlocks() {
 
             {/* SIDEBAR */}
             <div id="mySidebar" className="sidebar">
-                <a href="javascript:void(0)" className="closebtn" onClick={closeNav}>&times;</a>
+                <button className="closebtn" onClick={closeNav}>&times;</button>
                 <div id="buttons">
                     {/* Step size below is 4 because the textures are not lined up until the next 4th pixel increase. Odd... */}
                     <label htmlFor="texture_size_input" className="sidepanel_input_label">Texture Size: </label>
