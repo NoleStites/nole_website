@@ -80,7 +80,7 @@ function MinecraftBlocks() {
     // Where the key is the file name (ex: 'Block_of_Emerald.webp').
     function importAll(r) {
         let textures = {};
-        r.keys().map((item, index) => { textures[item.replace('./', '')] = r(item); });
+        r.keys().map((item, index) => { textures[item.replace('./', '')] = r(item); return 0;});
         return textures;
     }
 
