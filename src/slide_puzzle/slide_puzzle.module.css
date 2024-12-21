@@ -19,7 +19,6 @@
 }
 
 table {
-    background-color: rgb(58, 58, 58);
     height: var(--table_size);
     width: var(--table_size);
     border-spacing: 0px;
@@ -30,4 +29,7 @@ td {
     text-align: center;
     background-size: contain;
     /* border: 2px solid black; */
+}
+.empty_spot {
+    background: radial-gradient(white, grey, black);
 }
