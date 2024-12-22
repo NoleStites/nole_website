@@ -55,6 +55,8 @@ function handleKeyPress(key) { // TODO: Try to access the 'empty_spot' tile
     let empty_y = parseInt(empty_x_y[1]);
 
     if (key === 'w') {
+        // Next comment is using to avoid React warning of not using ===
+        // eslint-disable-next-line
         if (empty_x == table_size-1) {return;} // No piece below empty to move up
 
         // Get the right spot details
@@ -69,6 +71,8 @@ function handleKeyPress(key) { // TODO: Try to access the 'empty_spot' tile
         empty_spot_id = down_id;
     } 
     else if (key === 'a') {
+        // Next comment is using to avoid React warning of not using ===
+        // eslint-disable-next-line
         if (empty_y == table_size-1) {return;} // No piece right of empty to move left
 
         // Get the right spot details
@@ -83,6 +87,8 @@ function handleKeyPress(key) { // TODO: Try to access the 'empty_spot' tile
         empty_spot_id = right_id;
     } 
     else if (key === 's') {
+        // Next comment is using to avoid React warning of not using ===
+        // eslint-disable-next-line
         if (empty_x == 0) {return;} // No piece above empty to move down
 
         // Get the right spot details
@@ -97,6 +103,8 @@ function handleKeyPress(key) { // TODO: Try to access the 'empty_spot' tile
         empty_spot_id = up_id;
     } 
     else if (key === 'd') {
+        // Next comment is using to avoid React warning of not using ===
+        // eslint-disable-next-line
         if (empty_y == 0) {return;} // No piece left of empty to move right
         
         // Get the left spot details
@@ -112,14 +120,31 @@ function handleKeyPress(key) { // TODO: Try to access the 'empty_spot' tile
     }
 }
 
+function handleFileInput() {
+    return 0;
+}
+
 function SlidePuzzle() {
     document.addEventListener('keydown', function(event){
         handleKeyPress(event.key);
     })
+    const inputElement = document.getElementById('img');
+    if (inputElement !== null) {
+        inputElement.addEventListener('input', () => {
+            console.log("INPUT");
+        });
+    }
 
     return (
         <div className={styles.page}>
             <Navbar />
+
+            <label for="img">Select image:</label><br />
+            <input type="file" id="imageLoader" name="img" accept="image/*"/>
+            <button onClick={() => handleFileInput()}>Submit</button>
+            
+            <canvas id="imageCanvas" width="300" height="300"></canvas>
+            
             <div className={styles.flex_body}>
                 {makeTable(table_size)}
             </div>

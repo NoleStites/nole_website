@@ -25,9 +25,20 @@ table {
     border: 5px solid black;
     background-color: black;
 }
+
+/* @keyframes slide-right {
+    from {transform: translateX(-80px);}
+    to {transform: translateX(0px);}
+} */
+
 td {
     font-size: 20pt;
     text-align: center;
     background-size: contain;
-    /* border: 2px solid black; */
+    /* animation-name: slide-right; */
+    /* animation-duration: 2s; */
+    /* transition: transform 1s; */
 }
+/* td:hover {
+    transform: translateX(40px);
+} */
