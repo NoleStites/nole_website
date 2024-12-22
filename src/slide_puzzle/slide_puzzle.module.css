@@ -23,13 +23,11 @@ table {
     width: var(--table_size);
     border-spacing: 0px;
     border: 5px solid black;
+    background-color: black;
 }
 td {
     font-size: 20pt;
     text-align: center;
     background-size: contain;
     /* border: 2px solid black; */
-}
-.empty_spot {
-    background: radial-gradient(white, grey, black);
 }
