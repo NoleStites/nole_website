@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="styles.css" rel="stylesheet">
+        <link href="sidePanel.css" rel="stylesheet">
+        <script src="./script.js"></script>
+    </head>
+    <body>
+        <div id="mySidebar" class="sidebar">
+            <button class="closebtn" onclick={closeNav()}>&times;</button>
+            <div id="buttons">
+                <!-- {/* Step size below is 4 because the textures are not lined up until the next 4th pixel increase. Odd... */} -->
+                <label for="texture_size_input" class="sidepanel_input_label">Texture Size: </label>
+                <input onchange={changeTextureSize()} type="number" id="texture_size_input" min=20 max=200 step=4></input><br />
+                <label for="speed_input" class="sidepanel_input_label">Generation Speed: </label>
+                <input onchange={changeSpeed()} type="range" id="speed_input" min=0 max=500 step=10></input><br />
+                <div class="selection_buttons">
+                    <button class="selection_button" onclick={clear_texture_selections()}>Clear Selection</button>
+                    <button class="selection_button" onclick={select_all_textures()}>Select All</button>
+                    <button class="selection_button" onclick={generate()}>Generate</button>
+                </div>
+            </div>
+            <div id="texture_section">
+                <div id="texture_flex">
+                    <!-- {texture_panel} {/* This represents ALL textures */} -->
+                </div>
+            </div>
+        </div>
+        <div id="main">
+            <button class="openbtn" onclick={openNav()}>&#9776; View Textures</button>
+        </div>  
+        <div id="texture_grid"></div>
+    </body>
+</html>
