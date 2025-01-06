@@ -1,0 +1,45 @@
+html, body, #flex_box, .cells {
+    margin: 0px;
+    padding: 0px;
+}
+
+#flex_box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: black;
+}
+
+table {
+    background-color: grey;
+}
+
+.cells {
+    background-color: rgb(148, 148, 148);
+    background-size: cover;
+    color: white;
+    font-size: 15pt;
+    text-align: center;
+}
+
+.n0 {
+    background-image: none;
+    background-color: rgb(39, 0, 0);
+}
+.n1 {
+    background-image: url('number_textures/1.png');
+}
+.n2 {
+    background-image: url('number_textures/2.png');
+}
+.n3 {
+    background-image: url('number_textures/3.png');
+}
+.n4 {
+    background-image: url('number_textures/4.png');
+}
+.bombs {
+    background-image: url('number_textures/bomb.png');
+}
