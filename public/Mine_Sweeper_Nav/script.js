@@ -16,7 +16,7 @@ function getRandomInt(max) {
 
 const cell_size = 50;
 const border_size = Math.ceil(cell_size*(4/50)); // Because 4px was good for cell_size 50, use as ration for other sizes
-const border_spacing = Math.ceil(cell_size*(3/50));
+const border_spacing = Math.ceil(cell_size*(2/50));
 const table_dimensions = calc_num_rows_and_cols(cell_size + (2*border_size) + border_spacing);
 const rows = table_dimensions['rows'];
 const cols = table_dimensions['columns'];
@@ -39,7 +39,6 @@ for (let i = 0; i < rows; i++) {
         new_cell.style.minWidth = `${cell_size}px`;
         new_cell.style.minHeight = `${cell_size}px`;
         new_cell.style.border = `${border_size}px outset rgb(205, 205, 205)`;
-        // new_cell.innerHTML = new_cell.id;
         if (Math.random() < chance_for_bomb) { // Math.random returns value 0 to 1
             new_cell.classList.add("bombs");
         } else {
@@ -187,7 +186,6 @@ function getAdjacentLeft(cell_obj) {
 function propagateFromCell(cell, group_num) {
     // Assign the group to the given cell
     cell.classList.add(`group_${group_num}`);
-    cell.innerHTML = group_num;
 
     // Cycle from up, right, down, left and assign group to them
     let up_cell = getAdjacentUp(cell);
@@ -224,6 +222,7 @@ for (let i = 0; i < empty_cells.length; i++) {
     curr_group_num += 1;
 }
 
+// Apply styles to every cell in a group when any cell in that group is clicked
 for (let i = 0; i < curr_group_num; i++) {
     const elements = document.querySelectorAll(`.group_${i}`);
 
@@ -232,7 +231,49 @@ for (let i = 0; i < curr_group_num; i++) {
     element.addEventListener('click', () => {
         // Apply style to all elements in the class
         elements.forEach((el) => {
-            el.style.backgroundColor = 'green'; // Example style
+            // Reveal adjacent number groups
+            let coords = el.id.split(',');
+            let el_x = Number(coords[0]);
+            let el_y = Number(coords[1]);
+
+            // Find top-left and bottom-right corners of surrounding square of bomb to be incremented
+            let top_left = [0,0];
+            if (el_x > 0) {
+                top_left[0] = el_x - 1;
+            }
+            if (el_y > 0) {
+                top_left[1] = el_y - 1;
+            }
+
+            let bottom_right = [el_x, el_y]; // Default is farthest corner; if less, will be changed
+            if (el_x < rows-1) {
+                bottom_right[0] = el_x + 1;
+            }
+            if (el_y < cols-1) {
+                bottom_right[1] = el_y + 1;
+            }
+
+            let group = el.classList[el.classList.length-1];
+
+            // Loop over square formed by the top_left and bottom_right coords
+            for (let x = top_left[0]; x < bottom_right[0]+1; x++) {
+                for (let y = top_left[1]; y < bottom_right[1]+1; y++) {
+                    let curr_cell = document.getElementById(`${x},${y}`);                    
+                    let classification = curr_cell.classList[1]; // either "bombs" or "n0-4"
+                    let this_group = curr_cell.classList[curr_cell.classList.length-1];
+                    if ((classification === "bombs") || ((this_group.split('_')[0] === "group") && (this_group !== group))) {
+                        continue;
+                    }
+
+                    curr_cell.style.borderColor = "transparent";
+                    curr_cell.style.backgroundColor = "rgb(200, 200, 200)";
+
+                    let num = classification.split('n')[1];
+                    if (Number(num) !== 0) {
+                        curr_cell.style.backgroundImage = `url(number_textures/${num}.png)`;
+                    }
+                }
+            }
         });
     });
     });
