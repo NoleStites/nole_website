@@ -13,16 +13,26 @@ html, body, #flex_box, .cells {
 }
 
 table {
-    background-color: grey;
+    /* background-color: grey; */
+    /* opacity: 0; */
+    /* transform: scale(0); */
+    border-spacing: 0px;
+    transition: opacity 2s ease, transform 2s ease;
 }
 
 .cells {
     background-color: rgb(148, 148, 148);
+    /* background-color: black; */
     background-size: cover;
+    background-repeat: no-repeat;
     color: white;
     font-size: 15pt;
     text-align: center;
+    transition: border-color 1s, background-color 1s, background-size 1s, transform 1s ease, opacity 2s ease;
+    /* transform: rotateX(0deg); */
+    transform: scale(0);
 }
+
 
 /* .n0 {
     background-image: none;

@@ -13,18 +13,21 @@ function calc_num_rows_and_cols(texture_dimension) {
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
-
+    
 const cell_size = 50;
 const border_size = Math.ceil(cell_size*(4/50)); // Because 4px was good for cell_size 50, use as ration for other sizes
 const border_spacing = Math.ceil(cell_size*(2/50));
 const table_dimensions = calc_num_rows_and_cols(cell_size + (2*border_size) + border_spacing);
 const rows = table_dimensions['rows'];
 const cols = table_dimensions['columns'];
-let max_bombs = Math.floor(Math.sqrt(rows*cols)) + 10 // square root of the total number of cells
+let max_bombs = Math.floor(Math.sqrt(rows*cols)) + 20 // square root of the total number of cells
 let chance_for_bomb = max_bombs / (rows*cols);
+
+function makeTable() {
 
 let box = document.getElementById("flex_box");
 let table = document.createElement("table");
+table.id = "mine_table";
 table.style.borderSpacing = `${border_spacing}px`;
 
 // Create grid and assign bombs
@@ -53,6 +56,7 @@ box.appendChild(table);
 
 // For each bomb, increment numerical value of all surrounding cells
 let bombs = document.getElementsByClassName("bombs");
+let greatest_cell_value = 0;
 for (let i = 0; i < bombs.length; i++) {
     let curr_bomb = bombs[i];
     let bomb_coords = curr_bomb.id.split(',');
@@ -90,6 +94,11 @@ for (let i = 0; i < bombs.length; i++) {
             let new_value = Number(classification.split('n')[1]) + 1;
             curr_cell.classList.remove(classification);
             curr_cell.classList.add(`n${new_value}`);
+
+            // Update greatest cell value
+            if (new_value > greatest_cell_value) {
+                greatest_cell_value = new_value;
+            }
         }
     }
 }
@@ -226,6 +235,12 @@ for (let i = 0; i < empty_cells.length; i++) {
 for (let i = 0; i < curr_group_num; i++) {
     const elements = document.querySelectorAll(`.group_${i}`);
 
+    // Assign a red X to a cell in each empty group
+    // let X_cell_index = getRandomInt(elements.length);
+    let X_cell_index = Math.floor(elements.length / 2);
+    let X_cell = elements[X_cell_index];
+    X_cell.style.backgroundImage = `url(number_textures/X.png)`;
+
     // Add a click event listener to each element
     elements.forEach((element) => {
     element.addEventListener('click', () => {
@@ -235,6 +250,7 @@ for (let i = 0; i < curr_group_num; i++) {
             let coords = el.id.split(',');
             let el_x = Number(coords[0]);
             let el_y = Number(coords[1]);
+            el.style.backgroundImage = "none";
 
             // Find top-left and bottom-right corners of surrounding square of bomb to be incremented
             let top_left = [0,0];
@@ -278,3 +294,61 @@ for (let i = 0; i < curr_group_num; i++) {
     });
     });
 }
+
+// Make the table visible
+setTimeout(() => {
+    // table.style.opacity = "1";
+    let cell_objs = document.getElementsByClassName("cells");
+    for (let j = 0; j < cell_objs.length; j++) {
+        let cur_cell = cell_objs[j];
+        cur_cell.style.transform = "scale(1)";
+    }
+}, 200);
+
+setTimeout(() => {
+    table.style.backgroundColor = "grey";
+}, 1200); // This time is the animation time for the 'cells' scale plus time of previous timeout
+
+// Add clickable event listener to remaining cells (are not empty)
+let non_empty_classes = ["bombs"];
+for (let i = 0; i < greatest_cell_value; i++) {
+    non_empty_classes.push(`n${i+1}`);
+}
+for (let i = 0; i < non_empty_classes.length; i++) {
+    let curr_class_elements = document.querySelectorAll(`.${non_empty_classes[i]}`);
+    curr_class_elements.forEach((element) => {
+    element.addEventListener('click', () => {
+        // Remove border and display value (or bomb)
+        element.style.borderColor = "transparent";
+        element.style.backgroundColor = "rgb(200, 200, 200)";
+
+        let class_name = non_empty_classes[i];
+        if (class_name === "bombs") {
+            element.style.backgroundImage = `url(number_textures/bombs.png)`;
+            element.style.backgroundColor = 'red';
+
+            let table_obj = document.getElementById("mine_table");
+            table_obj.style.backgroundColor = "black";
+            setTimeout(() => {
+                let cell_objs = document.getElementsByClassName("cells");
+                for (let j = 0; j < cell_objs.length; j++) {
+                    let cur_cell = cell_objs[j];
+                    cur_cell.style.transform = "scale(0)";
+                }
+            }, 1000);
+
+            setTimeout(() => {
+                table_obj.remove();
+                makeTable();
+            }, 2000);
+        } 
+        else {
+            let cell_value = class_name.split('n')[1];
+            element.style.backgroundImage = `url(number_textures/${cell_value}.png)`;
+        }
+    });
+    });
+}
+} // END makeTable
+
+makeTable();
