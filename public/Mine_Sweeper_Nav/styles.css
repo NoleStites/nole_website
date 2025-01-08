@@ -1,0 +1,54 @@
+html, body, #flex_box, .cells {
+    margin: 0px;
+    padding: 0px;
+}
+
+#flex_box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: black;
+}
+
+table {
+    /* background-color: grey; */
+    /* opacity: 0; */
+    /* transform: scale(0); */
+    border-spacing: 0px;
+    transition: opacity 2s ease, transform 2s ease;
+}
+
+.cells {
+    background-color: rgb(148, 148, 148);
+    /* background-color: black; */
+    background-size: cover;
+    background-repeat: no-repeat;
+    color: white;
+    font-size: 15pt;
+    text-align: center;
+    transition: border-color 1s, background-color 1s, background-size 1s, transform 1s ease, opacity 2s ease;
+    /* transform: rotateX(0deg); */
+    transform: scale(0);
+}
+
+
+/* .n0 {
+    background-image: none;
+}
+.n1 {
+    background-image: url('number_textures/1.png');
+}
+.n2 {
+    background-image: url('number_textures/2.png');
+}
+.n3 {
+    background-image: url('number_textures/3.png');
+}
+.n4 {
+    background-image: url('number_textures/4.png');
+}
+.bombs {
+    background-image: url('number_textures/bombs.png');
+} */
