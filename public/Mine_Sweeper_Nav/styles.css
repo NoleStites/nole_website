@@ -35,13 +35,11 @@ body {
 
 #counter_value {
     width: 200px;
-    /* padding: 10px; */
     height: 65%;
     background-color: black;
     color: red;
     font-family: sans-serif;
     text-align: center;
-    /* font-size: large; */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -91,22 +89,17 @@ body {
 
 table {
     background-color: grey;
-    /* opacity: 0; */
-    /* transform: scale(0); */
-    /* border-spacing: 3px; */
     transition: opacity 2s ease, transform 2s ease;
 }
 
 .cells {
     background-color: rgb(148, 148, 148);
-    /* background-color: black; */
     background-size: cover;
     background-repeat: no-repeat;
     color: white;
     font-size: 15pt;
     text-align: center;
     transition: border-color 1s, background-color 1s, background-size 1s, transform 1s ease, opacity 2s ease;
-    /* transform: rotateX(0deg); */
     transform: scale(0);
 }
 

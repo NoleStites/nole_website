@@ -1,25 +1,53 @@
+const cell_size = 50;
+const border_size = Math.ceil(cell_size*(4/50)); // Because 4px was good for cell_size 50, use as ration for other sizes
+const border_spacing = Math.ceil(cell_size*(2/50));
+const table_dimensions = calc_num_rows_and_cols(cell_size + (2*border_size) + border_spacing);
+const rows = table_dimensions['rows'];
+const cols = table_dimensions['columns'];
+let max_bombs = Math.floor(Math.sqrt(rows*cols)) + 15; // square root of the total number of cells
+let chance_for_bomb = max_bombs / (rows*cols);
+let hidden_cells = []; // A list of string coords: x,y
+
 let flags_toggled = false;
 function toggleFlag() {
     let toggle = document.getElementById("flag_toggle");
+
     if (flags_toggled) {
         toggle.style.justifyContent = "flex-start";
         toggle.style.backgroundColor = "lightgrey";
+
+        // Remove flag icon from unflagged tiles
+        for (let i = 0; i < hidden_cells.length; i++) {
+            let cell = document.getElementById(hidden_cells[i]);
+            if (cell.style.backgroundImage !== `url("number_textures/flag.png")`) { // no flag, so remove background
+                cell.style.backgroundImage = "none";
+            }
+        }
+
         flags_toggled = false;
     } else {
         toggle.style.justifyContent = "flex-end";
         toggle.style.backgroundColor = "grey";
+
+        // Display flag icon on cells
+        for (let i = 0; i < hidden_cells.length; i++) {
+            let cell = document.getElementById(hidden_cells[i]);
+            if (cell.style.backgroundImage !== `url("number_textures/flag.png")`) { // no flag, so add background
+                cell.style.backgroundImage = "url(number_textures/flag_transparent.png)";
+            }
+        }
+
         flags_toggled = true;
     }
 }
 
 function calc_num_rows_and_cols(texture_dimension) {
-    // const viewportWidth = window.innerWidth;
-    // const viewportHeight = window.innerHeight;
     let grid = document.getElementById("grid");
-    const viewportWidth = grid.offsetWidth;
-    const viewportHeight = grid.offsetHeight;
-    let num_rows = Math.floor(viewportHeight / texture_dimension);
-    let num_columns = Math.floor(viewportWidth / texture_dimension);
+    const gridWidth = grid.offsetWidth;
+    const gridHeight = grid.offsetHeight;
+
+    let num_rows = Math.floor(gridHeight / texture_dimension);
+    let num_columns = Math.floor(gridWidth / texture_dimension);
 
     return {'columns':num_columns, 'rows':num_rows};
 }
@@ -28,15 +56,6 @@ function calc_num_rows_and_cols(texture_dimension) {
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
-    
-const cell_size = 50;
-const border_size = Math.ceil(cell_size*(4/50)); // Because 4px was good for cell_size 50, use as ration for other sizes
-const border_spacing = Math.ceil(cell_size*(2/50));
-const table_dimensions = calc_num_rows_and_cols(cell_size + (2*border_size) + border_spacing);
-const rows = table_dimensions['rows'];
-const cols = table_dimensions['columns'];
-let max_bombs = Math.floor(Math.sqrt(rows*cols)) + 20 // square root of the total number of cells
-let chance_for_bomb = max_bombs / (rows*cols);
 
 function makeTable() {
 
@@ -46,13 +65,22 @@ table.id = "mine_table";
 table.style.borderSpacing = `${border_spacing}px`;
 table.style.borderColor = "grey";
 
+// Reset the flag toggle
+flags_toggled = false;
+let toggle = document.getElementById("flag_toggle");
+toggle.style.justifyContent = "flex-start";
+toggle.style.backgroundColor = "lightgrey";
+
 // Create grid and assign bombs
+let num_bombs = 0;
+let correct_flags = 0; // The number of flags correctly placed (on a bomb)
 for (let i = 0; i < rows; i++) {
     let new_row = document.createElement("tr");
     for (let j = 0; j < cols; j++) {
         let new_cell = document.createElement("td");
         new_cell.classList.add("cells");
         new_cell.id = `${i},${j}`; // Every table cell is given a coordinate for future reference
+        hidden_cells.push(`${i},${j}`);
         new_cell.style.width = `${cell_size}px`;
         new_cell.style.height = `${cell_size}px`;
         new_cell.style.minWidth = `${cell_size}px`;
@@ -60,6 +88,7 @@ for (let i = 0; i < rows; i++) {
         new_cell.style.border = `${border_size}px outset rgb(205, 205, 205)`;
         if (Math.random() < chance_for_bomb) { // Math.random returns value 0 to 1
             new_cell.classList.add("bombs");
+            num_bombs += 1;
         } else {
             new_cell.classList.add("n0"); // to be incremented. Zero means no value in cell
         }
@@ -67,8 +96,12 @@ for (let i = 0; i < rows; i++) {
     }
     table.appendChild(new_row);
 }
+let num_flags = num_bombs;
 
 box.appendChild(table);
+
+// Flag count displayed is equal to number of bombs
+document.getElementById("counter_value").innerHTML = num_bombs;
 
 // For each bomb, increment numerical value of all surrounding cells
 let bombs = document.getElementsByClassName("bombs");
@@ -247,73 +280,197 @@ for (let i = 0; i < empty_cells.length; i++) {
     curr_group_num += 1;
 }
 
-// Apply styles to every cell in a group when any cell in that group is clicked
-for (let i = 0; i < curr_group_num; i++) {
-    const elements = document.querySelectorAll(`.group_${i}`);
+// This function handles the mechanics of selecting an empty (group) tile
+function handleGroupTile(element) {
+    let group = element.classList[2]; // Group of tiles to be revealed
+    let tiles_in_group = document.getElementsByClassName(group);
 
-    // Assign a red X to a cell in each empty group
-    // let X_cell_index = getRandomInt(elements.length);
-    let X_cell_index = Math.floor(elements.length / 2);
-    let X_cell = elements[X_cell_index];
-    X_cell.style.backgroundImage = `url(number_textures/X.png)`;
+    // Loop through each tile in the group and reveal 3x3 square centered at given tile
+    for (let i = 0; i < tiles_in_group.length; i++) {
+        // Get coords of tile
+        let curr_tile = tiles_in_group[i];
+        let coords = curr_tile.id.split(',');
+        let x = Number(coords[0]);
+        let y = Number(coords[1]);
 
-    // Add a click event listener to each element
-    elements.forEach((element) => {
-    element.addEventListener('click', () => {
-        // Apply style to all elements in the class
-        elements.forEach((el) => {
-            // Reveal adjacent number groups
-            let coords = el.id.split(',');
-            let el_x = Number(coords[0]);
-            let el_y = Number(coords[1]);
-            el.style.backgroundImage = "none";
+        // Find top-left and bottom-right corners of surrounding square to be revealed
+        let top_left = [0,0];
+        if (x > 0) {
+            top_left[0] = x - 1;
+        }
+        if (y > 0) {
+            top_left[1] = y - 1;
+        }
 
-            // Find top-left and bottom-right corners of surrounding square of bomb to be incremented
-            let top_left = [0,0];
-            if (el_x > 0) {
-                top_left[0] = el_x - 1;
-            }
-            if (el_y > 0) {
-                top_left[1] = el_y - 1;
-            }
+        let bottom_right = [x, y]; // Default is farthest corner; if less, will be changed
+        if (x < rows-1) {
+            bottom_right[0] = x + 1;
+        }
+        if (y < cols-1) {
+            bottom_right[1] = y + 1;
+        }
 
-            let bottom_right = [el_x, el_y]; // Default is farthest corner; if less, will be changed
-            if (el_x < rows-1) {
-                bottom_right[0] = el_x + 1;
-            }
-            if (el_y < cols-1) {
-                bottom_right[1] = el_y + 1;
-            }
+        // Loop over square formed by the top_left and bottom_right coords
+        for (let temp_x = top_left[0]; temp_x < bottom_right[0]+1; temp_x++) {
+            for (let temp_y = top_left[1]; temp_y < bottom_right[1]+1; temp_y++) {
+                let curr_cell = document.getElementById(`${temp_x},${temp_y}`);  
 
-            let group = el.classList[el.classList.length-1];
+                // Find what number (or not) to display in cell and style cell
+                let classification = curr_cell.classList[1]; // "n0-4" (should not be "bombs")
+                let this_group = curr_cell.classList[curr_cell.classList.length-1]; // For not revealing empty tiles from nearby groups
 
-            // Loop over square formed by the top_left and bottom_right coords
-            for (let x = top_left[0]; x < bottom_right[0]+1; x++) {
-                for (let y = top_left[1]; y < bottom_right[1]+1; y++) {
-                    let curr_cell = document.getElementById(`${x},${y}`);                    
-                    let classification = curr_cell.classList[1]; // either "bombs" or "n0-4"
-                    let this_group = curr_cell.classList[curr_cell.classList.length-1];
-                    if ((classification === "bombs") || ((this_group.split('_')[0] === "group") && (this_group !== group))) {
-                        continue;
-                    }
-
-                    curr_cell.style.borderColor = "transparent";
-                    curr_cell.style.backgroundColor = "rgb(200, 200, 200)";
-
-                    let num = classification.split('n')[1];
-                    if (Number(num) !== 0) {
-                        curr_cell.style.backgroundImage = `url(number_textures/${num}.png)`;
-                    }
+                if ((curr_cell.classList.length === 3) && (this_group !== group)) { // Different group, so skip
+                    continue;
                 }
+
+                // Remove from list of hidden cells
+                if (removeFromHiddenCells(curr_cell.id) === 1) { // Already removed, so skip
+                    continue;
+                }
+
+                // Check if there is flag on tile to reveal
+                if (curr_cell.style.backgroundImage === `url("number_textures/flag.png")`) { // Adjust flag count before removing
+                    num_flags += 1;
+                }
+
+                // Apply basic styles
+                curr_tile.style.backgroundImage = "none";
+                curr_cell.style.borderColor = "transparent";
+                curr_cell.style.backgroundColor = "rgb(200, 200, 200)";
+
+                if (classification === "n0") { // Do not assign number below
+                    continue;
+                }
+
+                // Get number of tile and display
+                let num = classification.split('n')[1];
+                curr_cell.style.backgroundImage = `url(number_textures/${num}.png)`;
             }
-        });
+        }
+    }
+    // Update flag count after revealing tiles
+    let counter = document.getElementById("counter_value");
+    counter.innerHTML = num_flags;
+} // END handleGroupTile
+
+// This function handles the mechanics of selecting a bomb tile
+function handleBombTile(element) {
+    element.style.backgroundImage = `url(number_textures/bombs.png)`;
+    element.style.backgroundColor = 'red';
+
+    let table_obj = document.getElementById("mine_table");
+    table_obj.style.backgroundColor = "lightgrey";
+    setTimeout(() => {
+        let cell_objs = document.getElementsByClassName("cells");
+        for (let j = 0; j < cell_objs.length; j++) {
+            let cur_cell = cell_objs[j];
+            cur_cell.style.transform = "scale(0)";
+        }
+    }, 1000);
+
+    setTimeout(() => {
+        table_obj.remove();
+        makeTable();
+    }, 2000);
+} // END handleBombTile
+
+// This function handles the mechanics of selecting a numbered tile
+function handleNumberedTile(element) {
+    let classes = element.classList;
+    let cell_value = classes[1].split('n')[1];
+
+    // Remove from list of hidden cells
+    if (removeFromHiddenCells(element.id) === 1) { // Already revealed, so do nothing
+        return;
+    };
+
+    // Apply basic styles
+    element.style.backgroundImage = `url(number_textures/${cell_value}.png)`;
+    element.style.borderColor = "transparent";
+    element.style.backgroundColor = "rgb(200, 200, 200)";
+} // END handleNumberedTile
+
+// This function handles the mechanics of placing or removing a flag on/from a tile
+function handleFlagPlacement(element) {
+    if (hidden_cells.includes(element.id) === false) { // Cell not hidden, so cannot apply flag
+        return;
+    }
+    let curr_background = element.style.backgroundImage;
+    let counter = document.getElementById("counter_value");
+    if (curr_background === `url("number_textures/flag.png")`) { // Remove flag
+        num_flags += 1;
+        counter.innerHTML = num_flags;
+        element.style.backgroundImage = "url(number_textures/flag_transparent.png)";
+
+        // Check if placed on bomb
+        if (element.classList[1] === "bombs") {
+            correct_flags -= 1; // No longer placed on a bomb
+        }
+    }
+    else { // Place flag
+        if (num_flags === 0) {return;} // Cannot place any more flags
+        num_flags -= 1;
+        counter.innerHTML = num_flags;
+        element.style.backgroundImage = "url(number_textures/flag.png)";
+
+        // Check if placed on bomb
+        if (element.classList[1] === "bombs") {
+            correct_flags += 1; 
+        }
+    }
+    // Check win condition
+    if (correct_flags === num_bombs) {
+        win();
+    }
+} // END handleFlagPlacement
+
+// The event listener for all cells
+const all_cells = document.querySelectorAll(`.cells`);
+all_cells.forEach((element) => {
+    element.addEventListener('click', () => {
+        // Three types of class lists:
+        // 1. ["cells", "n1-X"]             (numbered tile)
+        // 2. ["cells", "bombs"]            (bomb tile)
+        // 3. ["cells", "n0", "group_X"]    (group tile)
+        let classes = element.classList;
+
+        if (flags_toggled) { // placing flags takes priority over everything
+            handleFlagPlacement(element);
+        }
+        else if (element.style.backgroundImage === `url("number_textures/flag.png")`) { // Trying to reveal flag tile, so don't
+            return;
+        }
+        else if (classes[1] === "bombs") { // bomb tile
+            handleBombTile(element);
+        }
+        else if (classes.length === 3) { // group tile
+            handleGroupTile(element);
+        }
+        else { // numbered tile
+            handleNumberedTile(element);
+        }
     });
-    });
+});
+
+// This function is called when all flags have been placed correctly and ends the game
+function win() {
+    console.log("You win!");
+}
+
+// Because JS arrays don't have a convenient 'remove' method...
+function removeFromHiddenCells(item) {
+    let index = hidden_cells.indexOf(item);
+    if (index > -1) { // only splice array when item is found
+      hidden_cells.splice(index, 1); // 2nd parameter means remove one item only
+      return 0;
+    }
+    else {
+        return 1; // For error handling
+    }
 }
 
 // Make the table visible
 setTimeout(() => {
-    // table.style.opacity = "1";
     let cell_objs = document.getElementsByClassName("cells");
     for (let j = 0; j < cell_objs.length; j++) {
         let cur_cell = cell_objs[j];
@@ -325,46 +482,6 @@ setTimeout(() => {
     table.style.backgroundColor = "grey";
 }, 1200); // This time is the animation time for the 'cells' scale plus time of previous timeout
 
-// Add clickable event listener to remaining cells (are not empty)
-let non_empty_classes = ["bombs"];
-for (let i = 0; i < greatest_cell_value; i++) {
-    non_empty_classes.push(`n${i+1}`);
-}
-for (let i = 0; i < non_empty_classes.length; i++) {
-    let curr_class_elements = document.querySelectorAll(`.${non_empty_classes[i]}`);
-    curr_class_elements.forEach((element) => {
-    element.addEventListener('click', () => {
-        // Remove border and display value (or bomb)
-        element.style.borderColor = "transparent";
-        element.style.backgroundColor = "rgb(200, 200, 200)";
-
-        let class_name = non_empty_classes[i];
-        if (class_name === "bombs") {
-            element.style.backgroundImage = `url(number_textures/bombs.png)`;
-            element.style.backgroundColor = 'red';
-
-            let table_obj = document.getElementById("mine_table");
-            table_obj.style.backgroundColor = "lightgrey";
-            setTimeout(() => {
-                let cell_objs = document.getElementsByClassName("cells");
-                for (let j = 0; j < cell_objs.length; j++) {
-                    let cur_cell = cell_objs[j];
-                    cur_cell.style.transform = "scale(0)";
-                }
-            }, 1000);
-
-            setTimeout(() => {
-                table_obj.remove();
-                makeTable();
-            }, 2000);
-        } 
-        else {
-            let cell_value = class_name.split('n')[1];
-            element.style.backgroundImage = `url(number_textures/${cell_value}.png)`;
-        }
-    });
-    });
-}
 } // END makeTable
 
 makeTable();
