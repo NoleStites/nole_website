@@ -1,8 +1,23 @@
+let flags_toggled = false;
+function toggleFlag() {
+    let toggle = document.getElementById("flag_toggle");
+    if (flags_toggled) {
+        toggle.style.justifyContent = "flex-start";
+        toggle.style.backgroundColor = "lightgrey";
+        flags_toggled = false;
+    } else {
+        toggle.style.justifyContent = "flex-end";
+        toggle.style.backgroundColor = "grey";
+        flags_toggled = true;
+    }
+}
 
 function calc_num_rows_and_cols(texture_dimension) {
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
+    // const viewportWidth = window.innerWidth;
+    // const viewportHeight = window.innerHeight;
+    let grid = document.getElementById("grid");
+    const viewportWidth = grid.offsetWidth;
+    const viewportHeight = grid.offsetHeight;
     let num_rows = Math.floor(viewportHeight / texture_dimension);
     let num_columns = Math.floor(viewportWidth / texture_dimension);
 
@@ -25,10 +40,11 @@ let chance_for_bomb = max_bombs / (rows*cols);
 
 function makeTable() {
 
-let box = document.getElementById("flex_box");
+let box = document.getElementById("grid");
 let table = document.createElement("table");
 table.id = "mine_table";
 table.style.borderSpacing = `${border_spacing}px`;
+table.style.borderColor = "grey";
 
 // Create grid and assign bombs
 for (let i = 0; i < rows; i++) {
@@ -328,7 +344,7 @@ for (let i = 0; i < non_empty_classes.length; i++) {
             element.style.backgroundColor = 'red';
 
             let table_obj = document.getElementById("mine_table");
-            table_obj.style.backgroundColor = "black";
+            table_obj.style.backgroundColor = "lightgrey";
             setTimeout(() => {
                 let cell_objs = document.getElementsByClassName("cells");
                 for (let j = 0; j < cell_objs.length; j++) {
