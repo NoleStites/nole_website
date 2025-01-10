@@ -1,14 +1,53 @@
-const cell_size = 50;
+// Set cell size to 10% of smallest dimension (width or height) of game box
+let game_box = document.getElementById("grid");
+let viewWidth = game_box.offsetWidth;
+let viewHeight = game_box.offsetHeight;
+let smallDimension = Math.min(viewWidth, viewHeight);
+const cell_size = Math.floor(smallDimension * 0.10);
+
 const border_size = Math.ceil(cell_size*(4/50)); // Because 4px was good for cell_size 50, use as ration for other sizes
 const border_spacing = Math.ceil(cell_size*(2/50));
 const table_dimensions = calc_num_rows_and_cols(cell_size + (2*border_size) + border_spacing);
 const rows = table_dimensions['rows'];
 const cols = table_dimensions['columns'];
-let max_bombs = Math.floor(Math.sqrt(rows*cols)) + 15; // square root of the total number of cells
+// let max_bombs = Math.floor(Math.sqrt(rows*cols)) + 15; // square root of the total number of cells
+let max_bombs = 2;
 let chance_for_bomb = max_bombs / (rows*cols);
 let hidden_cells = []; // A list of string coords: x,y
+let has_won = false; // Used by the onClick listener to not let user interact with game after finishing
+
+// function resizeCells() {
+//     let game_box = document.getElementById("grid");
+//     let viewWidth = game_box.offsetWidth;
+//     let viewHeight = game_box.offsetHeight;
+//     let smallDimension = Math.min(viewWidth, viewHeight);
+//     let cell_size = 0;
+//     if (smallDimension === viewWidth) {
+//         cell_size = Math.floor(smallDimension / cols);
+//     }
+//     else {
+//         cell_size = Math.floor(smallDimension / rows);
+//     }
+//     console.log(`After: ${cell_size}\n`);
+//     const border_size = Math.ceil(cell_size*(4/50)); // Because 4px was good for cell_size 50, use as ration for other sizes
+
+//     let cells = document.getElementsByClassName("cells");
+//     for (let i = 0; i < cells.length; i++) {
+//         let cell = cells[i];
+//         cell.style.width = `${cell_size}px`;
+//         cell.style.height = `${cell_size}px`;
+//         cell.style.minWidth = `${cell_size}px`;
+//         cell.style.minHeight = `${cell_size}px`;
+//         cell.style.border = `${border_size}px outset rgb(205, 205, 205)`;
+//     }
+// }
+// addEventListener("resize", (event) => {
+//     console.log(`Before: ${cell_size}`);
+//     resizeCells();
+// });
 
 let flags_toggled = false;
+// Called by the HTML code
 function toggleFlag() {
     let toggle = document.getElementById("flag_toggle");
 
@@ -359,8 +398,9 @@ function handleBombTile(element) {
     element.style.backgroundColor = 'red';
 
     let table_obj = document.getElementById("mine_table");
-    table_obj.style.backgroundColor = "lightgrey";
     setTimeout(() => {
+        table_obj.style.backgroundColor = "lightgrey";
+
         let cell_objs = document.getElementsByClassName("cells");
         for (let j = 0; j < cell_objs.length; j++) {
             let cur_cell = cell_objs[j];
@@ -434,6 +474,8 @@ all_cells.forEach((element) => {
         // 3. ["cells", "n0", "group_X"]    (group tile)
         let classes = element.classList;
 
+        if (has_won) {return;} // Do not let user interact with game after they have won
+
         if (flags_toggled) { // placing flags takes priority over everything
             handleFlagPlacement(element);
         }
@@ -454,7 +496,9 @@ all_cells.forEach((element) => {
 
 // This function is called when all flags have been placed correctly and ends the game
 function win() {
-    console.log("You win!");
+    has_won = true;
+    let win_box = document.getElementById("play_again");
+    win_box.style.display = "flex";
 }
 
 // Because JS arrays don't have a convenient 'remove' method...
@@ -483,5 +527,30 @@ setTimeout(() => {
 }, 1200); // This time is the animation time for the 'cells' scale plus time of previous timeout
 
 } // END makeTable
+
+function playAgain() {
+    has_won = false;
+    document.getElementById("play_again").style.display = "none";
+
+    // The following is just about the same as the code executed by the bomb handler
+    let table_obj = document.getElementById("mine_table");
+    table_obj.style.backgroundColor = "lightgrey";
+
+    let cell_objs = document.getElementsByClassName("cells");
+    for (let j = 0; j < cell_objs.length; j++) {
+        let cur_cell = cell_objs[j];
+        cur_cell.style.transform = "scale(0)";
+    }
+
+    setTimeout(() => {
+        table_obj.remove();
+        makeTable();
+    }, 1000);
+}
+
+// Brings the user back to the landing page
+function goHome() {
+    location.href = "/Landing_Page";
+}
 
 makeTable();
