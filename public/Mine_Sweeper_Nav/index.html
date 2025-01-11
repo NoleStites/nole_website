@@ -5,6 +5,28 @@
         <script defer src="./script.js"></script>
     </head>
     <body>
-        <div id="flex_box"></div>
+        <div id="play_again">
+            <h2 id="you_win">You Win!</h2>
+            <button class="end_button" onclick="playAgain()">Play Again</button>
+            <button class="end_button" onclick="goHome()">Go Home</button>
+        </div>
+        <div id="game_flex">
+
+            <div id="counter_bar">
+                <button class="color_mode" onclick="applyPreset1()">Light Mode</button>
+                <h1 id="counter_value"></h1>
+                <button class="color_mode" onclick="applyPreset2()">Dark Mode</button>
+            </div>
+
+            <div id="grid"></div>
+
+            <div id="flag_box">
+                <div id="flag_icon"></div>
+                <div id="flag_toggle" onclick="toggleFlag()">
+                    <div id="toggle_circle"></div>
+                </div>
+            </div>
+
+        </div>
     </body>
 </html>
