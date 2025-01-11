@@ -21,6 +21,10 @@ let color4 = "rgb(148, 148, 148)"; // Cell background color
 let color5 = "rgb(168, 168, 168)";
 let color6 = "white" // For flag slider
 let accent_color = "red";
+let flag = `url("number_textures/flag.png")`;
+let flag_transparent = `url("number_textures/flag_transparent.png")`;
+let flag_prev = `url("number_textures/flag_blue.png")`;
+let flag_transparent_prev = `url("number_textures/flag_transparent_blue.png")`;
 
 // Will apply the colors currently assigned in the "Color Theme Variables" to the webpage
 function applyColorMode() {
@@ -32,8 +36,26 @@ function applyColorMode() {
     let toggle = document.getElementById("flag_toggle");
     if (flags_toggled) {
         toggle.style.backgroundColor = accent_color;
+        
+        for (let i = 0; i < hidden_cells.length; i++) {
+            let cell = document.getElementById(hidden_cells[i]);
+            let cell_back = cell.style.backgroundImage;
+            if (cell_back === flag_transparent_prev) {
+                cell.style.backgroundImage = flag_transparent;
+            } else {
+                cell.style.backgroundImage = flag;
+            }
+        }
     } else {
         toggle.style.backgroundColor = color2;
+
+        for (let i = 0; i < hidden_cells.length; i++) {
+            let cell = document.getElementById(hidden_cells[i]);
+            let cell_back = cell.style.backgroundImage;
+            if (cell_back === flag_prev) {
+                cell.style.backgroundImage = flag;
+            }
+        }
     }
 
     // Color 2
@@ -65,6 +87,9 @@ function applyColorMode() {
     // Accent Color
     document.getElementById("counter_value").style.color = accent_color;
     document.getElementById("play_again").style.boxShadow = `0px 0px 3px 3px ${accent_color}`;
+
+    // Flag Color
+    document.getElementById("flag_icon").style.backgroundImage = flag;
 }
 
 // Light mode
@@ -78,6 +103,10 @@ function applyPreset1() {
     color5 = `rgb(${c1_grey_val+40}, ${c1_grey_val+40}, ${c1_grey_val+40})`;
     color6 = `rgb(${c1_grey_val+127}, ${c1_grey_val+127}, ${c1_grey_val+127})`;
     accent_color = "red";
+    flag_prev = flag;
+    flag_transparent_prev = flag_transparent;
+    flag = `url("number_textures/flag.png")`;
+    flag_transparent = `url("number_textures/flag_transparent.png")`;
 
     applyColorMode();
 }
@@ -93,6 +122,10 @@ function applyPreset2() {
     color5 = `rgb(${c1_grey_val+40}, ${c1_grey_val+40}, ${c1_grey_val+40})`;
     color6 = `rgb(${c1_grey_val+127}, ${c1_grey_val+127}, ${c1_grey_val+127})`;
     accent_color = "blue";
+    flag_prev = flag;
+    flag_transparent_prev = flag_transparent;
+    flag = `url("number_textures/flag_blue.png")`;
+    flag_transparent = `url("number_textures/flag_transparent_blue.png")`;
 
     applyColorMode();
 }
@@ -413,7 +446,7 @@ function handleGroupTile(element) {
                 }
 
                 // Check if there is flag on tile to reveal
-                if (curr_cell.style.backgroundImage === `url("number_textures/flag.png")`) { // Adjust flag count before removing
+                if (curr_cell.style.backgroundImage === flag) { // Adjust flag count before removing
                     num_flags += 1;
                 }
 
@@ -487,10 +520,10 @@ function handleFlagPlacement(element) {
     }
     let curr_background = element.style.backgroundImage;
     let counter = document.getElementById("counter_value");
-    if (curr_background === `url("number_textures/flag.png")`) { // Remove flag
+    if (curr_background === flag) { // Remove flag
         num_flags += 1;
         counter.innerHTML = num_flags;
-        element.style.backgroundImage = "url(number_textures/flag_transparent.png)";
+        element.style.backgroundImage = flag_transparent;
 
         // Check if placed on bomb
         if (element.classList[1] === "bombs") {
@@ -501,7 +534,8 @@ function handleFlagPlacement(element) {
         if (num_flags === 0) {return;} // Cannot place any more flags
         num_flags -= 1;
         counter.innerHTML = num_flags;
-        element.style.backgroundImage = "url(number_textures/flag.png)";
+        // element.style.backgroundImage = "url(number_textures/flag.png)";
+        element.style.backgroundImage = flag;
 
         // Check if placed on bomb
         if (element.classList[1] === "bombs") {
@@ -594,7 +628,7 @@ function generateNewGame() {
             if (flags_toggled) { // placing flags takes priority over everything
                 handleFlagPlacement(element);
             }
-            else if (element.style.backgroundImage === `url("number_textures/flag.png")`) { // Trying to reveal flag tile, so don't
+            else if (element.style.backgroundImage === flag) { // Trying to reveal flag tile, so don't
                 return;
             }
             else if (classes[1] === "bombs") { // bomb tile
@@ -623,7 +657,7 @@ function toggleFlag() {
         // Remove flag icon from unflagged tiles
         for (let i = 0; i < hidden_cells.length; i++) {
             let cell = document.getElementById(hidden_cells[i]);
-            if (cell.style.backgroundImage !== `url("number_textures/flag.png")`) { // no flag, so remove background
+            if (cell.style.backgroundImage !== flag) { // no flag, so remove background
                 cell.style.backgroundImage = "none";
             }
         }
@@ -636,8 +670,8 @@ function toggleFlag() {
         // Display flag icon on cells
         for (let i = 0; i < hidden_cells.length; i++) {
             let cell = document.getElementById(hidden_cells[i]);
-            if (cell.style.backgroundImage !== `url("number_textures/flag.png")`) { // no flag, so add background
-                cell.style.backgroundImage = "url(number_textures/flag_transparent.png)";
+            if (cell.style.backgroundImage !== flag) { // no flag, so add background
+                cell.style.backgroundImage = flag_transparent;
             }
         }
 

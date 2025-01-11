@@ -4,6 +4,7 @@ let num_columns = 0;
 let num_rows = 0;
 let texture_size = 0;
 let speed = 100;
+// To add new textures, create new directory in "textures" folder, fill it with images, and place the name of the new folder in the list below and you're done!
 const texture_types = ['animal', 'building', 'ore', 'plant', 'redstone', 'sediment', 'stone', 'utility', 'wood'];
 let textures = {};
 let selections = [];

@@ -78,7 +78,8 @@ body {
     justify-content: flex-start;
     transition: justify-content 1s ease;
 }
-#flag_box::before {
+/* #flag_box::before { */
+#flag_icon {
     height: 60px;
     content: "";
     background-size: cover;
