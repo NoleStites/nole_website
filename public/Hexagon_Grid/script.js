@@ -16,33 +16,6 @@ console.log(`outer_hexagon_size: ${outer_hexagon_size}`);
 const container = document.getElementById("page");
 const content = document.getElementById("flex_box");
 
-// const parent = document.getElementById("hex1_border");
-// const child = document.getElementById("hex1");
-
-// child.addEventListener('mouseover', () => {
-//   parent.style.backgroundColor = 'rgba(255, 255, 255, 1)'; // Hovered color
-// });
-
-// child.addEventListener('mouseout', () => {
-//   parent.style.backgroundColor = 'rgba(255, 255, 255, 0)'; // Default color
-// });
-
-// const parent_rect = parent.getBoundingClientRect();
-// let x = 0;
-// let y = 0;
-// let w = parent_rect.width;
-// let h = parent_rect.height;
-// console.log(`xy: (${x}, ${y}) ; wh: (${w}, ${h})`);
-
-// const second = document.getElementById("hex2_border");
-// second.style.left = `${x}px`;
-// second.style.top = `${y - h}px`;
-// console.log(`left: ${second.style.left}; top: ${second.style.top}`);
-
-// const third = document.getElementById("hex3_border");
-// third.style.left = `${x - (w * 3/4)}px`;
-// third.style.top = `${y - (h * 1/2)}px`;
-
 const num_columns = Math.ceil(window.innerWidth / (0.75*outer_hexagon_size));
 const num_rows = Math.ceil(window.innerHeight / (outer_hexagon_size * Math.sqrt(3)/2));
 
@@ -66,3 +39,13 @@ for (let i = 0; i < num_columns; i++) {
 
   content.appendChild(new_column);
 }
+
+// function randomizeColors() {
+//   let hexes = document.getElementsByClassName("hexagon");
+//   for (let i = 0; i < hexes.length; i++) {
+//     let hex = hexes[i];
+//     hex.style.backgroundColor = `rgba(150, 0, 0, ${Math.random()})`;
+//   }
+// }
+
+// setInterval(randomizeColors, 2000);

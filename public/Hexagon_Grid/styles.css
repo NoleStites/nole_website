@@ -1,6 +1,6 @@
 :root {
     --hexagon-size: 100px; /* Width */
-    --hexagon-border-size: 1px;
+    --hexagon-border-size: 4px;
     --outer-hexagon-size: calc(var(--hexagon-size) + var(--hexagon-border-size));
 }
 
@@ -23,7 +23,9 @@ body {
     height: 100%;
     position: relative;
     overflow: hidden;
-    background-color: rgb(0, 0, 0);
+    background: linear-gradient(red, purple, blue);
+    /* background: radial-gradient(white, grey, black, black); */
+    background-color: black;
 }
 
 .flex_column {
@@ -54,9 +56,9 @@ body {
 
 .hexagon {
     width: var(--hexagon-size);
-    background-color: rgb(0, 68, 15);
-    transition: background-color 0.2s;
+    background-color: black;
+    transition: background-color 0.5s;
 }
 .hex_border:hover {
-    background-color: rgb(157, 255, 0);
+    background-color: white;
 }
