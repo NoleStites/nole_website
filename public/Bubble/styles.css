@@ -1,0 +1,32 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    background-color: rgb(0, 45, 66);
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+#circle {
+    width: 50vh;
+    height: 50vh;
+    border-radius: 50%;
+    z-index: 1;
+    overflow: hidden;
+    border: 3px solid grey;
+    background-color: lightgray;
+    text-align: center;
+    line-height: 50vh;
+    font-size: 30pt;
+    font-family: "Lexend", sans-serif;
+}
