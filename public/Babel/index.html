@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="styles.css" rel="stylesheet" />
+        <script src="script.js" defer></script>
+    </head>
+    <body>
+        <h1 id="heading">Babel Image Generator</h1>
+        <div id="flex_box">
+            <canvas id="imageCanvas" width="750" height="500"></canvas>
+            <div id="controls">
+                <button class="ctrl_btn" onclick="generateNewImage()">Generate Image</button>
+                <button class="ctrl_btn" onclick="startLoop()">Start Loop</button>
+                <button class="ctrl_btn" onclick="stopLoop()">Stop Loop</button>
+            </div>
+            <div id="speed_ctrls">
+                <input type="range" id="speedSlider" min="1" max="10">
+                <h2 id="speed_display">Image generated every <span id="speed_value">1</span> seconds</h2>
+            </div>
+        </div>
+    </body>
+</html>
