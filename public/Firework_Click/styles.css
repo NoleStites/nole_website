@@ -8,6 +8,20 @@ html {
     overflow: hidden;
 }
 
+body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#firework_text {
+    color: white;
+    font-size: 30pt;
+    font-family: sans-serif;
+}
+
 .clickParticle {
     aspect-ratio: 1/1;
     border-radius: 50%;
