@@ -1,0 +1,55 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#preview_box {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: lightgray;
+}
+
+/* Button styles */
+#tester {
+    width: fit-content;
+    aspect-ratio: 3/2;
+    background-color: black;
+    border: 3px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: left;
+    flex-direction: column;
+    padding: 20px 40px;
+
+    color: white;
+    font-size: 20pt;
+    font-family: sans-serif;
+}
+
+#content {
+    position: relative;
+    width: fit-content;
+    transition: text-decoration 0.5s;
+}
+
+#more_content {
+    width: fit-content;
+}
+
+pre {
+    width: 50%;
+    height: 100%;
+}
