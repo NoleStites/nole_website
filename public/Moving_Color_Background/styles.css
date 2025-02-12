@@ -1,0 +1,52 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    width: 100vw;
+    height: 100vh;
+    background-color: beige;
+}
+
+@keyframes rotate-colors {
+    100% {
+      background-position: 100% 100%;
+    }
+}
+
+body {
+    width: 100%;
+    height: 100%;
+}
+
+/* Flexbox styles */
+.flex {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: absolute;  
+    gap: 90px; /* set this value back to 0px to get a full grid */
+}
+
+#column_flex {
+    flex-direction: row;
+}
+
+#row_flex {
+    flex-direction: column;  
+}
+
+/* Column and row styles */
+.col, .row {
+    background-size: 200% 200%;
+    animation: rotate-colors 10s linear infinite;
+}
+
+.col {
+    height: 100%;
+}
+
+.row {
+    width: 100%;
+}
