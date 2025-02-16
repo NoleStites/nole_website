@@ -1,0 +1,69 @@
+:root {
+    --wave-width: 10px;
+    --wave-gap: 8px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(0, 0, 39);
+}
+
+#page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 30px;
+}
+
+#page_header {
+    font-family: sans-serif;
+    font-size: 40pt;
+    color: white;
+}
+
+.demo {
+    width: 100%;
+    height: 25%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--wave-gap);
+    background-color: navy;
+    box-shadow: 0px 0px 10px -3px white;
+}
+
+.demo_A_wave {
+    background-color: rgb(37, 255, 85);
+}
+
+.demo_B_wave {
+    background-color: rgb(243, 207, 0);
+}
+
+
+.wave {
+    width: var(--wave-width);
+    height: 0;
+    border-radius: var(--wave-width);
+    transition: height 0.5s;
+}
+
+
+button {
+    padding: 10px;
+    font-family: sans-serif;
+    font-size: 20pt;
+    background-color: aqua;
+}
+button:hover {
+    background-color: rgb(4, 189, 189);
+}
