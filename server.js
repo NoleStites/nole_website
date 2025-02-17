@@ -1,9 +1,21 @@
+/*
+  For everything involving the MongoDB/Mongoose database, I followed along with this tutorial:
+  https://youtu.be/fgTGADljAeg?si=7J5resTJlego1j5b
+*/
+require('dotenv').config() // Imports all of our environment variables in the '.env' file
+
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const mongoose = require('mongoose');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+mongoose.connect(process.env.DATABASE_URL); // Access environment variable
+const db = mongoose.connection;
+db.on('error', (error) => console.error(error));
+db.once('open', () => console.log("Connected to database."));
 
 app.get('/', (req, res) => {
   res.redirect('/Landing_Page');
@@ -29,6 +41,10 @@ app.get('/api/files/:subdir', (req, res) => {
     res.json(files); // Send the list of files in the subdirectory
   });
 });
+
+app.use(express.json());
+const testRouter = require("./routes/myRoute");
+app.use('/myRoute', testRouter);
 
 // Start the server
 app.listen(PORT, () => {

@@ -1,0 +1,28 @@
+GET http://localhost:3000/myRoute
+
+###
+
+GET http://localhost:3000/myRoute/67b3a013bf445346a291c0fd
+
+###
+
+POST http://localhost:3000/myRoute
+Content-Type: application/json
+
+{
+    "name": "John Smith",
+    "favoriteFruit": "orange"
+}
+
+###
+
+DELETE http://localhost:3000/myRoute/67b39fe1bf445346a291c0fa
+
+###
+
+PATCH http://localhost:3000/myRoute/67b3a013bf445346a291c0fd
+Content-Type: application/json
+
+{
+    "name": "New Person"
+}
