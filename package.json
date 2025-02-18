@@ -1,16 +1,19 @@
 {
-  "name": "minecraftblocks",
+  "name": "nole_website",
   "version": "1.0.0",
-  "main": "script.js",
-  "keywords": [],
+  "description": "Prerequisites:      1. Install nvm and node           $ sudo apt update             $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash        $ nvm install v22.11.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
   "author": "",
   "license": "ISC",
-  "description": "",
+  "devDependencies": {
+    "dotenv": "^16.4.7"
+  },
   "dependencies": {
     "express": "^4.21.2",
     "mongoose": "^8.10.1"
-  },
-  "devDependencies": {
-    "dotenv": "^16.4.7"
   }
 }

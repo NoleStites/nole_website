@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>MongoDB Demo</title>
+        <link href="./styles.css" rel="stylesheet" />
+        <script src="./script.js" defer></script>
+    </head>
+    <body>
+        <!-- Get all -->
+        <form method="GET" action="/myRoute">
+            <button type="submit">Fetch All</button>
+        </form>
+
+        <!-- Get one -->
+        <form id="getOneForm">
+            <label for="id">Tester ID: </label><br>
+            <input type="text" id="id" name="id"><br>
+            <button type="submit">Fetch One</button>
+        </form>
+
+        <!-- Create one -->
+        <form id="createTesterForm">
+            <label for="name">Name: </label><br>
+            <input type="text" id="name" name="name" /><br>
+            <label for="favoriteFruit">Favorite Fruit: </label><br>
+            <input type="text" id="favoriteFruit" name="favoriteFruit" /><br>
+            <button type="submit">Create Tester</button>
+        </form>
+
+        <p id="output_box"></p>
+    </body>
+</html>

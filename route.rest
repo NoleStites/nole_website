@@ -10,8 +10,8 @@ POST http://localhost:3000/myRoute
 Content-Type: application/json
 
 {
-    "name": "John Smith",
-    "favoriteFruit": "orange"
+    "name": "Bob Rover",
+    "favoriteFruit": "apple"
 }
 
 ###
