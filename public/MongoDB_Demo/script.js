@@ -1,20 +1,34 @@
-// Get one
-document.getElementById("getOneForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
-    const id = document.getElementById("id").value;
-    if (!id) {
-        alert("Please enter an ID");
-        return;
-    }
-    // window.location.href = `/myRoute/${id}`; // Redirect to the correct route
+function updateResultsSection(results_list) {
+    
+}
 
-    const response = await fetch(`/myRoute/${id}`, {
-        method: "GET"
+// Get one
+document.getElementById("searchForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+    const fname = document.getElementById("fname").value;
+    const lname = document.getElementById("lname").value;
+    const department = document.querySelector('input[name="department"]:checked').value;
+    const salary = document.getElementById("salary").value;
+
+    // Construct query parameters dynamically
+    const queryParams = new URLSearchParams();
+
+    if (fname) queryParams.append("fname", fname);
+    if (lname) queryParams.append("lname", lname);
+    if (department != "no_filter") queryParams.append("department", department);
+    if (salary) queryParams.append("salary", salary);
+
+    const response = await fetch(`/employeeRoute?${queryParams.toString()}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
     });
 
     if (response.ok) {
         const data = await response.json();
-        document.getElementById("output_box").innerHTML = data.favoriteFruit;
+        console.log(data);
+        // document.getElementById("output_box").innerHTML = data.favoriteFruit;
     } else {
         const error = await response.json();
         alert("Error: " + error.message);
@@ -22,24 +36,24 @@ document.getElementById("getOneForm").addEventListener("submit", async function 
 });
 
 // Create one
-document.getElementById("createTesterForm").addEventListener("submit", async function (event) {
-    event.preventDefault(); // Prevent default form submission
-    const name = document.getElementById("name").value;
-    const favoriteFruit = document.getElementById("favoriteFruit").value;
+// document.getElementById("createTesterForm").addEventListener("submit", async function (event) {
+//     event.preventDefault(); // Prevent default form submission
+//     const name = document.getElementById("name").value;
+//     const favoriteFruit = document.getElementById("favoriteFruit").value;
 
-    // Preprocess the form data before adding to database
-    // ...
+//     // Preprocess the form data before adding to database
+//     // ...
 
-    const response = await fetch("/myRoute", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, favoriteFruit })
-    });
+//     const response = await fetch("/myRoute", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ name, favoriteFruit })
+//     });
 
-    if (response.ok) {
-        alert("Tester created successfully!");
-    } else {
-        const error = await response.json();
-        alert("Error: " + error.message);
-    }
-});
+//     if (response.ok) {
+//         alert("Tester created successfully!");
+//     } else {
+//         const error = await response.json();
+//         alert("Error: " + error.message);
+//     }
+// });

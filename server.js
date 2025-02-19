@@ -43,8 +43,8 @@ app.get('/api/files/:subdir', (req, res) => {
 });
 
 app.use(express.json());
-const testRouter = require("./routes/myRoute");
-app.use('/myRoute', testRouter);
+const employeeRoute = require("./routes/employeeRoute");
+app.use('/employeeRoute', employeeRoute);
 
 // Start the server
 app.listen(PORT, () => {
