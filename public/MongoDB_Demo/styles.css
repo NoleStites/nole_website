@@ -19,7 +19,7 @@ body {
 
 #page_header_section {
     width: 100%;
-    height: fit-content;
+    height: 10%;
     flex-shrink: 0;
     padding: 25px;
     background-color: maroon;
@@ -36,8 +36,7 @@ body {
 #search_and_results_box {
     position: relative;
     width: 100%;
-    height: auto;
-    flex-grow: 1;
+    height: 90%;
     display: flex;
     flex-direction: row;
 }
@@ -112,6 +111,7 @@ button[type="submit"]:hover {
     flex-direction: column;
     align-items: center;
     gap: 20px;
+    flex-wrap: nowrap;
     padding: 20px 0px;
     overflow-y: auto;
     box-sizing: border-box;
@@ -119,8 +119,44 @@ button[type="submit"]:hover {
 
 .result {
     width: 75%;
-    height: 200px;
+    height: fit-content;
     flex-shrink: 0;
     background-color: rgb(240, 240, 240);
     border-radius: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.res_name_section {
+    background-color: rgb(223, 223, 223);
+    font-size: 16pt;
+    color: green;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.res_data_section {
+    height: auto;
+    font-size: 15pt;
+    padding: 10px;
+}
+
+/* Ex: Department: Sales */
+.dataAttr {
+    width: 100%;
+}
+.dataAttr_span {
+    color: navy;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.dataAttr_value {
+    color: black;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+#no_results {
+    font-size: 16pt;
 }
