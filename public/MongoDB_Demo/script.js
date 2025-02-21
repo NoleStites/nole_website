@@ -32,11 +32,33 @@ function updateResultsSection(results_list) {
         
         let result_el = document.createElement("div");
         result_el.classList.add("result");
+        result_el.dataset.employeeID = result_dict._id;
 
+        let top_section = document.createElement("div");
+        top_section.classList.add("res_top_section");
         let name_section = document.createElement("div");
         name_section.classList.add("res_name_section");
         name_section.innerHTML = result_dict.lname + ", " + result_dict.fname;
-        result_el.appendChild(name_section);
+
+        let update_res = document.createElement("img");
+        update_res.classList.add("update_btn");
+        update_res.src = "./update.svg";
+        update_res.addEventListener("click", function() {
+            return; // TODO
+        });
+
+        let delete_res = document.createElement("img");
+        delete_res.classList.add("delete_btn");
+        delete_res.src = "./delete.svg";
+        delete_res.addEventListener("click", function() {
+            result_el.remove();
+            deleteEmployee(result_el.dataset.employeeID);
+        });
+
+        top_section.appendChild(name_section);
+        top_section.appendChild(update_res);
+        top_section.appendChild(delete_res);
+        result_el.appendChild(top_section);
         
         let data_section = document.createElement("div");
         data_section.classList.add("res_data_section");
@@ -112,3 +134,17 @@ document.getElementById("searchForm").addEventListener("submit", async function 
 //         alert("Error: " + error.message);
 //     }
 // });
+
+// Delete One
+async function deleteEmployee(id) {
+    const response = await fetch(`/employeeRoute/${id}`, {
+        method: "DELETE",
+    });
+
+    if (response.ok) {
+        alert("Employee deleted successfully.");
+    } else {
+        const error = await response.json();
+        alert("Error: " + error.message);
+    }
+}
