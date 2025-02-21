@@ -113,27 +113,50 @@ document.getElementById("searchForm").addEventListener("submit", async function 
 });
 
 // Create one
-// document.getElementById("createTesterForm").addEventListener("submit", async function (event) {
-//     event.preventDefault(); // Prevent default form submission
-//     const name = document.getElementById("name").value;
-//     const favoriteFruit = document.getElementById("favoriteFruit").value;
+document.getElementById("cancel_create_btn").addEventListener("click", function() {
+    document.getElementById("popup_create_panel").style.display = "none";
+});
+document.getElementById("create_employee_btn").addEventListener("click", function() {
+    document.getElementById("popup_create_panel").style.display = "block";
+});
 
-//     // Preprocess the form data before adding to database
-//     // ...
+// Create one
+document.getElementById("create_form").addEventListener("submit", async function (event) {
+    event.preventDefault();
+    const fname = document.getElementById("c_fname").value;
+    const lname = document.getElementById("c_lname").value;
+    const department = document.querySelector('input[name="c_department"]:checked').value;
+    const salary = document.getElementById("c_salary").value;
 
-//     const response = await fetch("/myRoute", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ name, favoriteFruit })
-//     });
+    // Construct query parameters dynamically
+    const queryParams = new URLSearchParams();
 
-//     if (response.ok) {
-//         alert("Tester created successfully!");
-//     } else {
-//         const error = await response.json();
-//         alert("Error: " + error.message);
-//     }
-// });
+    if (fname) queryParams.append("fname", fname);
+    if (lname) queryParams.append("lname", lname);
+    if (department) queryParams.append("department", department);
+    if (salary) queryParams.append("salary", salary);
+
+    // const response = await fetch(`/employeeRoute?${queryParams.toString()}`, {
+    const response = await fetch(`/employeeRoute`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "fname": fname,
+            "lname": lname,
+            "department": department,
+            "salary": salary
+        })
+    });
+
+    if (response.ok) {
+        alert("Employee created successfully.");
+    } else {
+        const error = await response.json();
+        alert("Error: " + error.message);
+    }
+});
 
 // Delete One
 async function deleteEmployee(id) {

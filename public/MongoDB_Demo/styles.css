@@ -41,6 +41,32 @@ body {
     flex-direction: row;
 }
 
+#popup_create_panel {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.815);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display: none;
+}
+
+#create_form {
+    background-color: black;
+    width: 30%;
+}
+
+#create_btn, #cancel_create_btn {
+    background-color: white;
+    color: black;
+    text-align: center;
+}
+
+#create_btn:hover, #cancel_create_btn:hover {
+    background-color: red;
+}
+
 /* Search panel and form styles */
 #search_panel {
     width: 25%;
@@ -48,6 +74,10 @@ body {
     background-color: gray;
     padding: 10px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
 }
 
 form {
@@ -85,20 +115,35 @@ input[type="text"], input[type="number"] {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 20px;
 }
 
-button[type="submit"] {
+.submit_btn {
     width: 75%;
     height: fit-content;
     font-size: 15pt;
     padding: 10px;
-    background-color: black;
-    color: white;
     border: none;
     border-radius: 10px;
 }
-button[type="submit"]:hover {
+#search_btn {
+    background-color: black;
+    color: white;
+}
+#search_btn:hover {
     background-color: rgb(32, 32, 32);
+    cursor: pointer;
+}
+
+#create_employee_btn {
+    font-size: 16pt;
+    background-color: white;
+    border: 3px solid black;
+    border-radius: 10px;
+    padding: 20px;
+}
+#create_employee_btn:hover {
+    background-color: rgb(218, 218, 218);
     cursor: pointer;
 }
 
