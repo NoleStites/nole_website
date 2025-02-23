@@ -1,5 +1,5 @@
 :root {
-    --digit-font-size: 105px;
+    --digit-font-size: 205px;
     --space_between_digits: 10px;
     --digit-gap-in-column: 5px;
 }
@@ -30,7 +30,6 @@ body {
     justify-content: center;
     align-items: center;
     gap: var(--space_between_digits);
-    border: 1px dashed red;
     overflow: hidden;
 }
 
