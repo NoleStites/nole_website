@@ -46,6 +46,39 @@ function adjustTime(hour, minute, second) {
     changeDigit("second_one", second[1]);
 }
 
+// Change CSS variables to reflect either "dark" or "light" mode
+function changePageTheme(new_theme) {
+    if (new_theme === "light") { // Apply light mode
+        root.style.setProperty("--accent-color", "black");
+        root.style.setProperty("--background-color", "white");
+        root.style.setProperty("--icon-filter", "none");
+        root.style.setProperty("--hover-color", "rgb(225,225,225)");
+        document.getElementById("mode_icon").src = "./assets/moon.svg";
+        current_mode = "light";
+    } 
+    else { // Apply dark mode
+        root.style.setProperty("--accent-color", "white");
+        root.style.setProperty("--background-color", "black");
+        root.style.setProperty("--icon-filter", "invert(100%) sepia(1%) saturate(4579%) hue-rotate(177deg) brightness(111%) contrast(101%)");
+        root.style.setProperty("--hover-color", "rgb(30,30,30)");
+        document.getElementById("mode_icon").src = "./assets/sun.svg";
+        current_mode = "dark";
+    }
+}
+
+// Setup dark/light mode button
+let btn = document.getElementById("mode_btn");
+let current_mode = "light";
+changePageTheme(current_mode); // Set default theme
+btn.addEventListener("click", function() {
+    if (current_mode === "dark") {
+        changePageTheme("light");
+    }
+    else {
+        changePageTheme("dark");
+    }
+})
+
 // Get the clock to populate with digits
 let clock_box = document.getElementById("clock_box");
 
