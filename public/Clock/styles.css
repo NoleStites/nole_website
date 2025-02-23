@@ -1,3 +1,9 @@
+:root {
+    --digit-font-size: 105px;
+    --space_between_digits: 10px;
+    --digit-gap-in-column: 5px;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -7,4 +13,41 @@ body {
     width: 100vw;
     height: 100vh;
     background-color: black;
+}
+
+#page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#clock_box {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space_between_digits);
+    border: 1px dashed red;
+    overflow: hidden;
+}
+
+.digit_column {
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: var(--digit-gap-in-column);
+    height: var(--digit-font-size);
+    /* transform: translateY(calc(-0*(var(--digit-font-size) + var(--digit-gap-in-column)))); */
+    transition: transform 0.5s;
+}
+
+.digit {
+    font-family: monospace;
+    color: white;
+    font-size: var(--digit-font-size);
+    line-height: var(--digit-font-size);
+    text-align: center;
 }
