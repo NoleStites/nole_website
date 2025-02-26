@@ -109,8 +109,60 @@ function dragElement(elmnt) {
   }
 }
 
+// Returns the distance between two points
+function calculateDistance(x1, y1, x2, y2) {
+    return Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+}
+
 document.getElementById("create_edge_btn").addEventListener("click", function(event) {
-    console.log("create edge");
+    let nodes = document.getElementsByClassName("node");
+    let node = nodes[0];
+    let node_size = node.getBoundingClientRect().width; // Includes border
+    
+    let node1 = nodes[0].getBoundingClientRect();
+    let node2 = nodes[1].getBoundingClientRect();
+    let edge_length = calculateDistance(node1.x, node1.y, node2.x, node2.y);
+    node1 = nodes[0];
+    node2 = nodes[1];
+
+    let edge_thickness = 5;
+    let preview_box = document.getElementById("preview_section");
+    let new_edge = document.createElement("div");
+    new_edge.classList.add("edge");
+    new_edge.style.width = edge_length + 'px';
+    new_edge.style.height = edge_thickness + 'px';
+    // Center line on center of line connecting nodes
+    // let directional_factor_X = Math.sign(node1.offsetLeft - node2.offsetLeft);
+    // let directional_factor_Y = Math.sign(node1.offsetTop - node2.offsetTop);
+    // let centerX = node1.offsetLeft + directional_factor_X*(node1.offsetLeft - node2.offsetLeft)/2;
+    // let centerY = node1.offsetTop + directional_factor_Y*(node1.offsetTop - node2.offsetTop)/2;
+    
+    let node1_X = node.offsetLeft + node_size/2;
+    let node1_Y = node.offsetTop + node_size/2;
+    console.log("Node1 Center: ", node1_X, node1_Y);
+    let node2_X = node2.offsetLeft + node_size/2;
+    let node2_Y = node2.offsetTop + node_size/2;
+    console.log("Node2 Center: ", node2_X, node2_Y);
+
+    // Calculate the true center of the edge between the nodes
+    let centerX = node1_X + (-1*(node1_X - node2_X)/2);
+    let centerY = node1_Y + (-1*(node1_Y - node2_Y)/2);
+
+    // Offset the div element to have its center centered on the line between the two nodes
+    let centerX_offset = centerX - edge_length/2;
+    let centerY_offset = centerY - edge_thickness/2;
+
+    // Calculate angle to rotate edge div
+    // cos(<ang>) = adjacent / hypotenuse
+    let angle_factor = node2_Y < node1_Y ? -1 : 1; // Determines whether to rotate clockwise or counter-clockwise
+    let adj = (node2_X - centerX);
+    let hyp = edge_length/2;
+    let angle = angle_factor * Math.acos(adj/hyp); // in radians
+
+    new_edge.style.top = centerY_offset + 'px';
+    new_edge.style.left = centerX_offset + 'px';
+    new_edge.style.transform = `RotateZ(${angle}rad)`;
+    preview_box.appendChild(new_edge);
 });
 
 // Edge canvas
