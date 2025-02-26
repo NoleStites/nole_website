@@ -1,4 +1,5 @@
 var num_nodes = 0; // used for creating unique IDs for nodes
+var adj_lists = {}; // Maps node IDs to a list of node IDs they are connected to
 
 // "Create button" event listener
 document.getElementById("create_node_btn").addEventListener("click", function(event) {
@@ -53,6 +54,7 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
         placed_node.style.left = event.layerX - node_size/2 + 'px';
         document.getElementById("preview_section").appendChild(placed_node);
         dragElement(placed_node); // make node draggable
+        adj_lists[placed_node.id] = []; // Add node to adjacency lists with default no edges
     }
     document.getElementById("preview_section").addEventListener("click", click);
 
@@ -168,7 +170,8 @@ function createEdge(node1, node2) {
 }
 
 document.getElementById("create_edge_btn").addEventListener("click", function(event) {
-    console.log(event.shiftKey);
+    let start_node = null; // stores the ID of a node
+
     let endpoint_node_ids = [];
     let latest_edge_preview = null;
     // Allow every node to be selected
@@ -177,30 +180,77 @@ document.getElementById("create_edge_btn").addEventListener("click", function(ev
         nodes[i].addEventListener("click", selectableForEdge);
     }
 
-    // What happens when a node is selected for new edge endpoint
-    function selectableForEdge(event) {
-        if (endpoint_node_ids.includes(event.target.id)) { // Toggle off (remove from selection)
-            let index = endpoint_node_ids.indexOf(event.target.id);
-            endpoint_node_ids.splice(index, 1);
-            if (latest_edge_preview != null) {
-                document.getElementById(latest_edge_preview).remove(); // Remove
-                latest_edge_preview = null;
-            }
-        }
-        else { // Toggle on (add to selection)
-            if (endpoint_node_ids.length === 2) { // Cannot connect edge to three endpoints
-                return;
-            }
-            endpoint_node_ids.push(event.target.id);
-        }
-
-        if (endpoint_node_ids.length === 2) {
-            let node1 = document.getElementById(endpoint_node_ids[0]);
-            let node2 = document.getElementById(endpoint_node_ids[1]);
-            latest_edge_preview = createEdge(node1, node2);
+    // Resets the preview section to the default edge creation view (no nodes highlighted)
+    function toggleOffStartNode(node_id) {
+        start_node = null;
+        let node = document.getElementById(node_id);
+        node.classList.remove("create_edge_start");
+        // let end_nodes = document.getElementsByClassName("create_edge_end");
+        let end_nodes = adj_lists[node_id];
+        for (let i = 0; i < end_nodes.length; i++) {
+            let curr_node = document.getElementById(end_nodes[i]);
+            curr_node.classList.remove("create_edge_end");
         }
     }
-    // createEdge(nodes[0], nodes[1]);
+
+    // Sets the given noed as the start of all created edges and highlights endpoints (all nodes toggleable)
+    function toggleOnStartNode(node_id) {
+        start_node = node_id;
+        let node = document.getElementById(node_id);
+        node.classList.add("create_edge_start");
+        let adjacencies = adj_lists[node.id];
+        for (let i = 0; i < adjacencies.length; i++) { // Iterate through all already-connected nodes
+            let curr_node = document.getElementById(adjacencies[i]);
+            curr_node.classList.add("create_edge_end");
+        }
+    }
+
+    // What happens when a node is selected for new edge endpoint
+    function selectableForEdge(event) {
+        if (event.shiftKey) { // Selected new start point
+            if  (start_node === null) { // No start mode currently selected
+                toggleOnStartNode(event.target.id);
+            }
+            else if (event.target.id === start_node) { // Toggle off start node
+                toggleOffStartNode(start_node);
+            }
+            else { // Change start node
+                toggleOffStartNode(start_node);
+                toggleOnStartNode(event.target.id);
+            }
+            return;
+        }
+
+        // BELOW: Left click with no shift (creates edges)
+        if (start_node === null || event.target.id === start_node) { // Cannot create edge to self
+            return; 
+        }
+
+        // Toggle clicked node ON or OFF (connected or not connected)
+        let selected_node = event.target;
+        let adjacencies = adj_lists[selected_node.id];
+        if (selected_node.classList.contains("create_edge_end")) { // Remove edge
+            selected_node.classList.remove("create_edge_end");
+
+            // Remove each node from each other's adjacency lists
+            let index = adj_lists[selected_node.id].indexOf(start_node);
+            adj_lists[selected_node.id].splice(index, 1);
+            index = adj_lists[start_node].indexOf(selected_node.id);
+            adj_lists[start_node].splice(index, 1);
+
+            let edge = document.getElementById(`edge_${start_node}_${selected_node.id}`);
+            if (edge === null) {
+                edge = document.getElementById(`edge_${selected_node.id}_${start_node}`);
+            }
+            edge.remove();
+        }
+        else { // Add edge
+            selected_node.classList.add("create_edge_end");
+            adj_lists[selected_node.id].push(start_node);
+            adj_lists[start_node].push(selected_node.id);
+            createEdge(document.getElementById(start_node), selected_node);
+        }
+    }
 });
 
 
