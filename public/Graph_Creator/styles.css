@@ -1,3 +1,8 @@
+:root {
+    --node-size: 100px;
+    --edge-thickness: 5px;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -35,7 +40,7 @@ body {
     align-items: center;
     display: none;
 }
-#esc_to_cancel {
+#mask_text {
     color: white;
     background-color: black;
     border-radius: 5px;
@@ -100,7 +105,7 @@ body {
 
 /* Preview Section Styles */
 .node {
-    width: 100px;
+    width: var(--node-size);
     aspect-ratio: 1/1;
     background-color: lightblue;
     border: 2px solid navy;
@@ -119,9 +124,9 @@ body {
 .edge {
     background-color: purple;
     position: absolute;
+    height: var(--edge-thickness);
     z-index: 2;
     transform-origin: center;
-    transition: transform 2s;
 }
 .edge:hover {
     background-color: red;

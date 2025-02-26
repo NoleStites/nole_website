@@ -1,9 +1,15 @@
 var num_nodes = 0; // used for creating unique IDs for nodes
 var adj_lists = {}; // Maps node IDs to a list of node IDs they are connected to
+var edge_thickness = 5; // px
+
+const css_styles = getComputedStyle(document.documentElement); // Or any specific element
+var edge_thickness = css_styles.getPropertyValue("--edge-thickness").slice(0,-2); // px
+var node_size = css_styles.getPropertyValue("--node-size").slice(0,-2); // Includes border
 
 // "Create button" event listener
 document.getElementById("create_node_btn").addEventListener("click", function(event) {
     document.getElementById("side_panel_mask").style.display = "flex";
+    document.getElementById("mask_text").innerHTML = "&quotESC&quot to cancel";
 
     // Create and add a new node to the page
     let new_node = document.createElement("div");
@@ -94,7 +100,6 @@ function dragElement(elmnt) {
     pos3 = e.clientX;
     pos4 = e.clientY;
     // set the element's new position:
-
     let new_top = elmnt.offsetTop - pos2;
     let new_left = elmnt.offsetLeft - pos1;
 
@@ -106,6 +111,11 @@ function dragElement(elmnt) {
 
     elmnt.style.top = new_top + "px";
     elmnt.style.left = new_left + "px";
+
+    let adjecent_nodes = adj_lists[e.target.id];
+    for (let i = 0; i < adjecent_nodes.length; i++) {
+        moveEdge(elmnt, document.getElementById(adjecent_nodes[i]));
+    }
   }
 
   function closeDragElement() {
@@ -120,24 +130,18 @@ function calculateDistance(x1, y1, x2, y2) {
     return Math.sqrt((x2-x1)**2 + (y2-y1)**2);
 }
 
-// Given two node elements, this function will create an edge between them
-// Returns the ID of the edge (in the form 'edge_nodeX_nodeY')
-function createEdge(node1, node2) {
-    // Define new edge length and thickness and fetch node sizes
+// Will move the edge between the two given nodes (called when either node is repostioned)
+function moveEdge(node1, node2) {
+    // Get the edge element
+    let edge = document.getElementById(`edge_${node1.id}_${node2.id}`);
+    if (edge === null) {
+        edge = document.getElementById(`edge_${node2.id}_${node1.id}`);
+    }
+
     let node1_props = node1.getBoundingClientRect();
     let node2_props = node2.getBoundingClientRect();
-    let edge_thickness = 5; // px
     let edge_length = calculateDistance(node1_props.x, node1_props.y, node2_props.x, node2_props.y);
-    let node_size = node1_props.width; // Includes border
 
-    // Create the new edge (div) element
-    let preview_box = document.getElementById("preview_section");
-    let new_edge = document.createElement("div");
-    new_edge.classList.add("edge");
-    new_edge.id = `edge_${node1.id}_${node2.id}`;
-    new_edge.style.width = edge_length + 'px';
-    new_edge.style.height = edge_thickness + 'px';
-    
     // Calculate the center points of each given node within the preview area
     let node1_X = node1.offsetLeft + node_size/2;
     let node1_Y = node1.offsetTop + node_size/2;
@@ -160,17 +164,39 @@ function createEdge(node1, node2) {
     let angle = angle_factor * Math.acos(adj/hyp); // in radians
 
     // Translate and rotate the edge into position
-    new_edge.style.top = centerY_offset + 'px';
-    new_edge.style.left = centerX_offset + 'px';
-    new_edge.style.transform = `RotateZ(${angle}rad)`;
+    edge.style.top = centerY_offset + 'px';
+    edge.style.left = centerX_offset + 'px';
+    edge.style.transform = `RotateZ(${angle}rad)`;
+}
+
+// Given two node elements, this function will create an edge between them
+// Returns the ID of the edge (in the form 'edge_nodeX_nodeY')
+function createEdge(node1, node2) {
+    // Define new edge length and thickness and fetch node sizes
+    let node1_props = node1.getBoundingClientRect();
+    let node2_props = node2.getBoundingClientRect();
+    let edge_length = calculateDistance(node1_props.x, node1_props.y, node2_props.x, node2_props.y);
+
+    // Create the new edge (div) element
+    let preview_box = document.getElementById("preview_section");
+    let new_edge = document.createElement("div");
+    new_edge.classList.add("edge");
+    new_edge.id = `edge_${node1.id}_${node2.id}`;
+    new_edge.style.width = edge_length + 'px';
+    // new_edge.style.height = edge_thickness + 'px';
+    preview_box.appendChild(new_edge);
+    
+    // Translate and rotate edge to fit between nodes
+    moveEdge(node1, node2);
 
     // Add the edge to the document and return its ID
-    preview_box.appendChild(new_edge);
     return new_edge.id;
 }
 
 document.getElementById("create_edge_btn").addEventListener("click", function(event) {
     let start_node = null; // stores the ID of a node
+    document.getElementById("side_panel_mask").style.display = "flex";
+    document.getElementById("mask_text").innerHTML = "&quotESC&quot to quit";
 
     let endpoint_node_ids = [];
     let latest_edge_preview = null;
@@ -251,6 +277,20 @@ document.getElementById("create_edge_btn").addEventListener("click", function(ev
             createEdge(document.getElementById(start_node), selected_node);
         }
     }
+
+    // Listen for cancel "ESC"
+    function keydown(event) {
+        if (event.key === "Escape") {
+            toggleOffStartNode(start_node);
+            let nodes = document.getElementsByClassName("node");
+            for (let i = 0; i < nodes.length; i++) {
+                nodes[i].removeEventListener("click", selectableForEdge);
+            }
+            document.removeEventListener("keydown", keydown);
+            document.getElementById("side_panel_mask").style.display = "none";
+        }
+    }
+    document.addEventListener("keydown", keydown);
 });
 
 
