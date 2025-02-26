@@ -1,3 +1,4 @@
+var num_nodes = 0; // used for creating unique IDs for nodes
 
 // "Create button" event listener
 document.getElementById("create_node_btn").addEventListener("click", function(event) {
@@ -13,15 +14,15 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
     new_node.style.top = event.clientY - node_size/2 + 'px';
     new_node.style.left = event.clientX - node_size/2 + 'px';
 
-    // Don't allow any nodes to be clickable at the moment
-    setNodePointerEvents("none");
-
+    // For all nodes on the page, either allow or disallow pointer events
     function setNodePointerEvents(value) {
         let nodes = document.getElementsByClassName("node");
         for (let i = 0; i < nodes.length; i++) {
             nodes[i].style.pointerEvents = value;
         }
     }
+    // Don't allow any nodes to be clickable at the moment
+    setNodePointerEvents("none");
 
     // Have node follow cursor for placing
     function mousemove(event) {
@@ -33,7 +34,7 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
     }
     document.addEventListener("mousemove", mousemove);
 
-    // Make preview section clickable
+    // Disable create node action
     function resetCreateAction() {
         document.removeEventListener("keydown", keydown);
         document.removeEventListener("mousemove", mousemove);
@@ -42,14 +43,16 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
         setNodePointerEvents("all");
         new_node.remove();
     }
+    // Make preview section clickable
     let placed_node;
     function click(event) {
         placed_node = new_node.cloneNode("deep");
+        placed_node.id = `node${num_nodes}`;
+        num_nodes += 1;
         placed_node.style.top = event.layerY - node_size/2 + 'px';
         placed_node.style.left = event.layerX - node_size/2 + 'px';
         document.getElementById("preview_section").appendChild(placed_node);
-        dragElement(placed_node);
-        resetCreateAction();
+        dragElement(placed_node); // make node draggable
     }
     document.getElementById("preview_section").addEventListener("click", click);
 
@@ -57,6 +60,7 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
     function keydown(event) {
         if (event.key === "Escape") {
             resetCreateAction();
+            num_nodes -= 1;
         }
     }
     document.addEventListener("keydown", keydown);
@@ -114,56 +118,100 @@ function calculateDistance(x1, y1, x2, y2) {
     return Math.sqrt((x2-x1)**2 + (y2-y1)**2);
 }
 
-document.getElementById("create_edge_btn").addEventListener("click", function(event) {
-    let nodes = document.getElementsByClassName("node");
-    let node = nodes[0];
-    let node_size = node.getBoundingClientRect().width; // Includes border
-    
-    let node1 = nodes[0].getBoundingClientRect();
-    let node2 = nodes[1].getBoundingClientRect();
-    let edge_length = calculateDistance(node1.x, node1.y, node2.x, node2.y);
-    node1 = nodes[0];
-    node2 = nodes[1];
+// Given two node elements, this function will create an edge between them
+// Returns the ID of the edge (in the form 'edge_nodeX_nodeY')
+function createEdge(node1, node2) {
+    // Define new edge length and thickness and fetch node sizes
+    let node1_props = node1.getBoundingClientRect();
+    let node2_props = node2.getBoundingClientRect();
+    let edge_thickness = 5; // px
+    let edge_length = calculateDistance(node1_props.x, node1_props.y, node2_props.x, node2_props.y);
+    let node_size = node1_props.width; // Includes border
 
-    let edge_thickness = 5;
+    // Create the new edge (div) element
     let preview_box = document.getElementById("preview_section");
     let new_edge = document.createElement("div");
     new_edge.classList.add("edge");
+    new_edge.id = `edge_${node1.id}_${node2.id}`;
     new_edge.style.width = edge_length + 'px';
     new_edge.style.height = edge_thickness + 'px';
-    // Center line on center of line connecting nodes
-    // let directional_factor_X = Math.sign(node1.offsetLeft - node2.offsetLeft);
-    // let directional_factor_Y = Math.sign(node1.offsetTop - node2.offsetTop);
-    // let centerX = node1.offsetLeft + directional_factor_X*(node1.offsetLeft - node2.offsetLeft)/2;
-    // let centerY = node1.offsetTop + directional_factor_Y*(node1.offsetTop - node2.offsetTop)/2;
     
-    let node1_X = node.offsetLeft + node_size/2;
-    let node1_Y = node.offsetTop + node_size/2;
-    console.log("Node1 Center: ", node1_X, node1_Y);
+    // Calculate the center points of each given node within the preview area
+    let node1_X = node1.offsetLeft + node_size/2;
+    let node1_Y = node1.offsetTop + node_size/2;
     let node2_X = node2.offsetLeft + node_size/2;
     let node2_Y = node2.offsetTop + node_size/2;
-    console.log("Node2 Center: ", node2_X, node2_Y);
 
     // Calculate the true center of the edge between the nodes
     let centerX = node1_X + (-1*(node1_X - node2_X)/2);
     let centerY = node1_Y + (-1*(node1_Y - node2_Y)/2);
 
-    // Offset the div element to have its center centered on the line between the two nodes
+    // Offset the edge (div) element to have its center centered on the line between the two nodes
     let centerX_offset = centerX - edge_length/2;
     let centerY_offset = centerY - edge_thickness/2;
 
-    // Calculate angle to rotate edge div
+    // Calculate angle to rotate edge div (currently a flat line)
     // cos(<ang>) = adjacent / hypotenuse
     let angle_factor = node2_Y < node1_Y ? -1 : 1; // Determines whether to rotate clockwise or counter-clockwise
     let adj = (node2_X - centerX);
     let hyp = edge_length/2;
     let angle = angle_factor * Math.acos(adj/hyp); // in radians
 
+    // Translate and rotate the edge into position
     new_edge.style.top = centerY_offset + 'px';
     new_edge.style.left = centerX_offset + 'px';
     new_edge.style.transform = `RotateZ(${angle}rad)`;
+
+    // Add the edge to the document and return its ID
     preview_box.appendChild(new_edge);
+    return new_edge.id;
+}
+
+document.getElementById("create_edge_btn").addEventListener("click", function(event) {
+    console.log(event.shiftKey);
+    let endpoint_node_ids = [];
+    let latest_edge_preview = null;
+    // Allow every node to be selected
+    let nodes = document.getElementsByClassName("node");
+    for (let i = 0; i < nodes.length; i++) {
+        nodes[i].addEventListener("click", selectableForEdge);
+    }
+
+    // What happens when a node is selected for new edge endpoint
+    function selectableForEdge(event) {
+        if (endpoint_node_ids.includes(event.target.id)) { // Toggle off (remove from selection)
+            let index = endpoint_node_ids.indexOf(event.target.id);
+            endpoint_node_ids.splice(index, 1);
+            if (latest_edge_preview != null) {
+                document.getElementById(latest_edge_preview).remove(); // Remove
+                latest_edge_preview = null;
+            }
+        }
+        else { // Toggle on (add to selection)
+            if (endpoint_node_ids.length === 2) { // Cannot connect edge to three endpoints
+                return;
+            }
+            endpoint_node_ids.push(event.target.id);
+        }
+
+        if (endpoint_node_ids.length === 2) {
+            let node1 = document.getElementById(endpoint_node_ids[0]);
+            let node2 = document.getElementById(endpoint_node_ids[1]);
+            latest_edge_preview = createEdge(node1, node2);
+        }
+    }
+    // createEdge(nodes[0], nodes[1]);
 });
+
+
+
+
+
+
+
+
+
+
 
 // Edge canvas
 let canvas = document.getElementById("edge_canvas");
