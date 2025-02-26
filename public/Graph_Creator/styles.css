@@ -95,3 +95,7 @@ body {
     position: absolute;
     z-index: 3;
 }
+.node:hover {
+    background-color: green;
+    cursor: move;
+}

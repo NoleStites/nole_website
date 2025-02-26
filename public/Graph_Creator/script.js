@@ -12,7 +12,16 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
     let node_size = new_node.clientWidth;
     new_node.style.top = event.clientY - node_size/2 + 'px';
     new_node.style.left = event.clientX - node_size/2 + 'px';
-    new_node.style.pointerEvents = "none";
+
+    // Don't allow any nodes to be clickable at the moment
+    setNodePointerEvents("none");
+
+    function setNodePointerEvents(value) {
+        let nodes = document.getElementsByClassName("node");
+        for (let i = 0; i < nodes.length; i++) {
+            nodes[i].style.pointerEvents = value;
+        }
+    }
 
     // Have node follow cursor for placing
     function mousemove(event) {
@@ -30,15 +39,17 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
         document.removeEventListener("mousemove", mousemove);
         document.getElementById("preview_section").removeEventListener("click", click);
         document.getElementById("side_panel_mask").style.display = "none";
+        setNodePointerEvents("all");
         new_node.remove();
     }
+    let placed_node;
     function click(event) {
-        let placed_node = new_node.cloneNode("deep");
-        resetCreateAction();
+        placed_node = new_node.cloneNode("deep");
         placed_node.style.top = event.layerY - node_size/2 + 'px';
         placed_node.style.left = event.layerX - node_size/2 + 'px';
-        placed_node.style.pointerEvents = "all";
         document.getElementById("preview_section").appendChild(placed_node);
+        dragElement(placed_node);
+        resetCreateAction();
     }
     document.getElementById("preview_section").addEventListener("click", click);
 
@@ -50,3 +61,50 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
     }
     document.addEventListener("keydown", keydown);
 });
+
+// Make the DIV element draggable:
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  let preview_box = document.getElementById("preview_section").getBoundingClientRect();
+  let elmnt_props = elmnt.getBoundingClientRect();
+
+  elmnt.onmousedown = dragMouseDown;
+
+  function dragMouseDown(e) {
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+
+    let new_top = elmnt.offsetTop - pos2;
+    let new_left = elmnt.offsetLeft - pos1;
+
+    // Do not let the node leave the preview area
+    if (new_top < 0) {new_top = 0;}
+    else if (new_top > preview_box.height - elmnt_props.width) {new_top = preview_box.height - elmnt_props.width;}
+    if (new_left < 0) {new_left = 0;}
+    else if (new_left > preview_box.width - elmnt_props.width) {new_left = preview_box.width - elmnt_props.width;}
+
+    elmnt.style.top = new_top + "px";
+    elmnt.style.left = new_left + "px";
+  }
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
