@@ -108,3 +108,20 @@ function dragElement(elmnt) {
     document.onmousemove = null;
   }
 }
+
+document.getElementById("create_edge_btn").addEventListener("click", function(event) {
+    console.log("create edge");
+});
+
+// Edge canvas
+let canvas = document.getElementById("edge_canvas");
+
+// Set canvas size to fill preview space (cannot use css or else warp)
+let preview_box = document.getElementById("preview_section").getBoundingClientRect();
+canvas.width = preview_box.width;
+canvas.height = preview_box.height;
+
+// const ctx = canvas.getContext('2d');
+// ctx.beginPath(); // Start a new drawing path
+// ctx.arc(100, 100, 50, 0, 2*Math.PI); // Create the circle arc
+// ctx.stroke();
