@@ -75,9 +75,33 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
     document.addEventListener("keydown", keydown);
 });
 
+// Hides the info panel
+function toggleInfoPanelOff() {
+    document.getElementById("node_info_section").style.display = "none";
+    document.getElementById("label_input").removeEventListener("input", updateLabel);
+}
+
+// Displays, in the side panel, info for the given node
+function updateLabel(event) {
+    document.getElementById(_selected_node).innerHTML = event.target.value;
+}
+
+var _selected_node;
+function toggleInfoPanelOn(node_id) {
+    _selected_node = node_id;
+    let node = document.getElementById(node_id);
+    let info_panel = document.getElementById("node_info_section");
+    info_panel.style.display = "block";
+
+    let label_input = document.getElementById("label_input");
+    label_input.value = node.innerHTML;
+    label_input.addEventListener("input", updateLabel); // Every time something is typed
+}
+
 // What to do when a node is selected normally
 function standardNodeSelect(event) {
-    console.log(`Selected: ${event.target.id}`);
+    toggleInfoPanelOff();
+    toggleInfoPanelOn(event.target.id);
 }
 
 // Make the DIV element draggable:
