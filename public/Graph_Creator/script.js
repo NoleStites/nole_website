@@ -141,6 +141,7 @@ function moveEdge(node1, node2) {
     let node1_props = node1.getBoundingClientRect();
     let node2_props = node2.getBoundingClientRect();
     let edge_length = calculateDistance(node1_props.x, node1_props.y, node2_props.x, node2_props.y);
+    edge.style.width = edge_length + 'px';
 
     // Calculate the center points of each given node within the preview area
     let node1_X = node1.offsetLeft + node_size/2;
@@ -182,11 +183,9 @@ function createEdge(node1, node2) {
     let new_edge = document.createElement("div");
     new_edge.classList.add("edge");
     new_edge.id = `edge_${node1.id}_${node2.id}`;
-    new_edge.style.width = edge_length + 'px';
-    // new_edge.style.height = edge_thickness + 'px';
     preview_box.appendChild(new_edge);
     
-    // Translate and rotate edge to fit between nodes
+    // Size, translate, and rotate edge to fit between nodes
     moveEdge(node1, node2);
 
     // Add the edge to the document and return its ID
