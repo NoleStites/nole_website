@@ -1,5 +1,6 @@
 :root {
     --node-size: 100px;
+    --node-z-index: 3;
     --edge-thickness: 5px;
 }
 
@@ -103,6 +104,13 @@ body {
     cursor: pointer;
 }
 
+#node_info_section {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
 /* Preview Section Styles */
 .node {
     width: var(--node-size);
@@ -111,7 +119,12 @@ body {
     border: 2px solid navy;
     border-radius: 50%;
     position: absolute;
-    z-index: 3;
+    z-index: var(--node-z-index);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20pt;
+    font-family: sans-serif;
 }
 .node:hover {
     background-color: green;

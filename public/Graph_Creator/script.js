@@ -5,6 +5,7 @@ var edge_thickness = 5; // px
 const css_styles = getComputedStyle(document.documentElement); // Or any specific element
 var edge_thickness = css_styles.getPropertyValue("--edge-thickness").slice(0,-2); // px
 var node_size = css_styles.getPropertyValue("--node-size").slice(0,-2); // Includes border
+var node_zIndex = Number(css_styles.getPropertyValue("--node-z-index"));
 
 // "Create button" event listener
 document.getElementById("create_node_btn").addEventListener("click", function(event) {
@@ -58,6 +59,7 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
         num_nodes += 1;
         placed_node.style.top = event.layerY - node_size/2 + 'px';
         placed_node.style.left = event.layerX - node_size/2 + 'px';
+        placed_node.addEventListener("click", standardNodeSelect);
         document.getElementById("preview_section").appendChild(placed_node);
         dragElement(placed_node); // make node draggable
         adj_lists[placed_node.id] = []; // Add node to adjacency lists with default no edges
@@ -68,21 +70,28 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
     function keydown(event) {
         if (event.key === "Escape") {
             resetCreateAction();
-            num_nodes -= 1;
         }
     }
     document.addEventListener("keydown", keydown);
 });
+
+// What to do when a node is selected normally
+function standardNodeSelect(event) {
+    console.log(`Selected: ${event.target.id}`);
+}
 
 // Make the DIV element draggable:
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   let preview_box = document.getElementById("preview_section").getBoundingClientRect();
   let elmnt_props = elmnt.getBoundingClientRect();
+  var adjacent_nodes;
 
   elmnt.onmousedown = dragMouseDown;
 
   function dragMouseDown(e) {
+    adjacent_nodes = adj_lists[e.target.id];
+    document.getElementById(e.target.id).style.zIndex = node_zIndex+1; // Resolve issues with cursor detecting different node when on it
     e.preventDefault();
     // get the mouse cursor position at startup:
     pos3 = e.clientX;
@@ -112,16 +121,16 @@ function dragElement(elmnt) {
     elmnt.style.top = new_top + "px";
     elmnt.style.left = new_left + "px";
 
-    let adjecent_nodes = adj_lists[e.target.id];
-    for (let i = 0; i < adjecent_nodes.length; i++) {
-        moveEdge(elmnt, document.getElementById(adjecent_nodes[i]));
+    for (let i = 0; i < adjacent_nodes.length; i++) {
+        moveEdge(elmnt, document.getElementById(adjacent_nodes[i]));
     }
   }
 
-  function closeDragElement() {
+  function closeDragElement(e) {
     // stop moving when mouse button is released:
     document.onmouseup = null;
     document.onmousemove = null;
+    document.getElementById(e.target.id).style.zIndex = node_zIndex;
   }
 }
 
@@ -133,10 +142,7 @@ function calculateDistance(x1, y1, x2, y2) {
 // Will move the edge between the two given nodes (called when either node is repostioned)
 function moveEdge(node1, node2) {
     // Get the edge element
-    let edge = document.getElementById(`edge_${node1.id}_${node2.id}`);
-    if (edge === null) {
-        edge = document.getElementById(`edge_${node2.id}_${node1.id}`);
-    }
+    let edge = document.getElementById(createEdgeID(node1.id, node2.id));
 
     let node1_props = node1.getBoundingClientRect();
     let node2_props = node2.getBoundingClientRect();
@@ -170,6 +176,14 @@ function moveEdge(node1, node2) {
     edge.style.transform = `RotateZ(${angle}rad)`;
 }
 
+// Given two node IDs (node0, node1, etc.), will an ID of the format
+// 'edge_nodeX_nodeY' such that X is the smaller node ID and Y is the larger
+function createEdgeID(node_id1, node_id2) {
+    let smallest_id = "node" + Math.min(Number(node_id1.slice(4)), Number(node_id2.slice(4)));
+    let largest_id = "node" + Math.max(Number(node_id1.slice(4)), Number(node_id2.slice(4)));
+    return `edge_${smallest_id}_${largest_id}`;
+}
+
 // Given two node elements, this function will create an edge between them
 // Returns the ID of the edge (in the form 'edge_nodeX_nodeY')
 function createEdge(node1, node2) {
@@ -182,10 +196,11 @@ function createEdge(node1, node2) {
     let preview_box = document.getElementById("preview_section");
     let new_edge = document.createElement("div");
     new_edge.classList.add("edge");
-    new_edge.id = `edge_${node1.id}_${node2.id}`;
+    // Create id with smallest node listed first
+    new_edge.id = createEdgeID(node1.id, node2.id);
     preview_box.appendChild(new_edge);
     
-    // Size, translate, and rotate edge to fit between nodes
+    // Size, translate,  and rotate edge to fit between nodes
     moveEdge(node1, node2);
 
     // Add the edge to the document and return its ID
@@ -203,6 +218,7 @@ document.getElementById("create_edge_btn").addEventListener("click", function(ev
     let nodes = document.getElementsByClassName("node");
     for (let i = 0; i < nodes.length; i++) {
         nodes[i].addEventListener("click", selectableForEdge);
+        nodes[i].removeEventListener("click", standardNodeSelect);
     }
 
     // Resets the preview section to the default edge creation view (no nodes highlighted)
@@ -284,6 +300,7 @@ document.getElementById("create_edge_btn").addEventListener("click", function(ev
             let nodes = document.getElementsByClassName("node");
             for (let i = 0; i < nodes.length; i++) {
                 nodes[i].removeEventListener("click", selectableForEdge);
+                nodes[i].addEventListener("click", standardNodeSelect);
             }
             document.removeEventListener("keydown", keydown);
             document.getElementById("side_panel_mask").style.display = "none";
