@@ -1,0 +1,161 @@
+:root {
+    --node-size: 100px;
+    --node-z-index: 3;
+    --edge-thickness: 5px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    font-family: sans-serif;
+}
+
+#page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+}
+
+#side_panel {
+    width: 25%;
+    height: 100%;
+    border-right: 2px solid black;
+    background-color: lightgray;
+    position: relative;
+}
+#side_panel_mask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.699);
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display: none;
+}
+#mask_text {
+    color: white;
+    background-color: black;
+    border-radius: 5px;
+    font-size: 20pt;
+    padding: 20px;
+    box-shadow: 0 0 3px 0 white;
+}
+
+#preview_section {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+/* side Panel Styles */
+#side_panel_heading {
+    width: 100%;
+    font-size: 30pt;
+    text-align: center;
+    padding: 10px 0px;
+    background-color: rgb(194, 194, 194);
+    border-bottom: 1px solid black;
+}
+
+#btn_box {
+    width: 100%;
+    height: fit-content;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.ctrl_btn {
+    border-radius: 5px;
+    border: 1px solid black;
+    text-align: center;
+}
+
+#create_node_btn, #delete_node_btn {
+    width: 50px;
+    line-height: 50px;
+    aspect-ratio: 1/1;
+    font-size: 30pt;
+}
+#create_node_btn:hover, #delete_node_btn:hover {
+    background-color: yellow;
+    cursor: pointer;
+}
+
+#create_edge_btn {
+    font-size: 25pt;
+    padding: 10px;
+}
+#create_edge_btn:hover {
+    background-color: yellow;
+    cursor: pointer;
+}
+
+#node_info_section {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    box-sizing: border-box;
+    display: none;
+}
+
+/* Preview Section Styles */
+.node {
+    width: var(--node-size);
+    aspect-ratio: 1/1;
+    background-color: lightblue;
+    border: 2px solid navy;
+    border-radius: 50%;
+    position: absolute;
+    z-index: var(--node-z-index);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20pt;
+    font-family: sans-serif;
+    text-wrap: wrap;
+    text-align: center;
+}
+.node:hover {
+    background-color: green;
+    cursor: move;
+}
+
+.edge {
+    background-color: purple;
+    position: absolute;
+    height: var(--edge-thickness);
+    z-index: 2;
+    transform-origin: center;
+}
+.edge:hover {
+    background-color: red;
+}
+
+/* Style applied to the start node of edge creation */
+.create_edge_start {
+    box-shadow: 0px 0px 3px 3px green;
+}
+
+/* Style applied to the end nodes of edge creation */
+.create_edge_end {
+    box-shadow: 0px 0px 3px 3px blue;
+}
+
+/* Style applied to each node when delete mode is activated */
+.delete_node {
+    box-shadow: 0px 0px 3px 3px red;
+}

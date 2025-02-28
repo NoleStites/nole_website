@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Graph Creator</title>
+        <link href="./styles.css" rel="stylesheet" />
+        <script src="./script.js" defer></script>
+    </head>
+    <body>
+        <div id="page">
+            <div id="side_panel">
+                <div id="side_panel_mask">
+                    <h2 id="mask_text">"ESC" to cancel</h2>
+                </div>
+                <h1 id="side_panel_heading">Graph Creator</h1>
+                <div id="btn_box">
+                    <div id="create_node_btn" class="ctrl_btn">+</div>
+                    <div id="delete_node_btn" class="ctrl_btn">-</div>
+                    <div id="create_edge_btn" class="ctrl_btn">Edit Edges</div>
+                </div>
+                <div id="node_info_section">
+                    <label for="label_input">Label:</label>
+                    <input type="text" id="label_input">
+                </div>
+            </div>
+            <div id="preview_section">
+                <canvas id="edge_canvas"></canvas>
+            </div>
+        </div>
+    </body>
+</html>
