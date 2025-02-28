@@ -7,10 +7,19 @@ var edge_thickness = css_styles.getPropertyValue("--edge-thickness").slice(0,-2)
 var node_size = css_styles.getPropertyValue("--node-size").slice(0,-2); // Includes border
 var node_zIndex = Number(css_styles.getPropertyValue("--node-z-index"));
 
+// Functions for showing and hidding the side panel mask. When toggling on, provide message to display.
+function toggleSidePanelMaskOff() {
+    document.getElementById("side_panel_mask").style.display = "none";
+    document.getElementById("mask_text").innerHTML = "";
+}
+function toggleSidePanelMaskOn(message) {
+    document.getElementById("side_panel_mask").style.display = "flex";
+    document.getElementById("mask_text").innerHTML = message;
+}
+
 // "Create button" event listener
 document.getElementById("create_node_btn").addEventListener("click", function(event) {
-    document.getElementById("side_panel_mask").style.display = "flex";
-    document.getElementById("mask_text").innerHTML = "&quotESC&quot to cancel";
+    toggleSidePanelMaskOn("&quotESC&quot to cancel");
 
     // Create and add a new node to the page
     let new_node = document.createElement("div");
@@ -47,7 +56,7 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
         document.removeEventListener("keydown", keydown);
         document.removeEventListener("mousemove", mousemove);
         document.getElementById("preview_section").removeEventListener("click", click);
-        document.getElementById("side_panel_mask").style.display = "none";
+        toggleSidePanelMaskOff();
         setNodePointerEvents("all");
         new_node.remove();
     }
@@ -56,9 +65,20 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
     function click(event) {
         placed_node = new_node.cloneNode("deep");
         placed_node.id = `node${num_nodes}`;
+        placed_node.innerHTML = num_nodes;
         num_nodes += 1;
-        placed_node.style.top = event.layerY - node_size/2 + 'px';
-        placed_node.style.left = event.layerX - node_size/2 + 'px';
+        let top = event.layerY - node_size/2;
+        let left = event.layerX - node_size/2;
+
+        // Enforce upper and lower bounds (keep node in box)
+        let preview_box = document.getElementById("preview_section").getBoundingClientRect();
+        if (event.layerX < node_size/2) {left = 0;}
+        else if (event.layerX > (preview_box.width - node_size)) {left = preview_box.width - node_size;}
+        if (event.layerY < node_size/2) {top = 0;}
+        else if (event.layerY > (preview_box.height - node_size)) {top = preview_box.height - node_size;}
+
+        placed_node.style.top = top + 'px';
+        placed_node.style.left = left + 'px';
         placed_node.addEventListener("click", standardNodeSelect);
         document.getElementById("preview_section").appendChild(placed_node);
         dragElement(placed_node); // make node draggable
@@ -233,8 +253,7 @@ function createEdge(node1, node2) {
 
 document.getElementById("create_edge_btn").addEventListener("click", function(event) {
     let start_node = null; // stores the ID of a node
-    document.getElementById("side_panel_mask").style.display = "flex";
-    document.getElementById("mask_text").innerHTML = "&quotESC&quot to quit";
+    toggleSidePanelMaskOn("&quotESC&quot to quit");
 
     let endpoint_node_ids = [];
     let latest_edge_preview = null;
@@ -327,13 +346,23 @@ document.getElementById("create_edge_btn").addEventListener("click", function(ev
                 nodes[i].addEventListener("click", standardNodeSelect);
             }
             document.removeEventListener("keydown", keydown);
-            document.getElementById("side_panel_mask").style.display = "none";
+            toggleSidePanelMaskOff();
         }
     }
     document.addEventListener("keydown", keydown);
 });
 
+document.getElementById("delete_node_btn").addEventListener("click", function(event) {
+    toggleSidePanelMaskOn("&quotESC&quot to quit");
 
+    // Listen for cancel "ESC"
+    function keydown(event) {
+        if (event.key === "Escape") {
+            toggleSidePanelMaskOff();
+        }
+    }
+    document.addEventListener("keydown", keydown);
+});
 
 
 
