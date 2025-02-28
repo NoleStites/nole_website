@@ -95,12 +95,6 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
     document.addEventListener("keydown", keydown);
 });
 
-// Hides the info panel
-function toggleInfoPanelOff() {
-    document.getElementById("node_info_section").style.display = "none";
-    document.getElementById("label_input").removeEventListener("input", updateLabel);
-}
-
 // Displays, in the side panel, info for the given node
 function updateLabel(event) {
     document.getElementById(_selected_node).innerHTML = event.target.value;
@@ -116,6 +110,12 @@ function toggleInfoPanelOn(node_id) {
     let label_input = document.getElementById("label_input");
     label_input.value = node.innerHTML;
     label_input.addEventListener("input", updateLabel); // Every time something is typed
+}
+
+// Hides the info panel
+function toggleInfoPanelOff() {
+    document.getElementById("node_info_section").style.display = "none";
+    document.getElementById("label_input").removeEventListener("input", updateLabel);
 }
 
 // What to do when a node is selected normally
@@ -252,6 +252,8 @@ function createEdge(node1, node2) {
 }
 
 document.getElementById("create_edge_btn").addEventListener("click", function(event) {
+    if (num_nodes === 0) {return;}
+
     let start_node = null; // stores the ID of a node
     toggleSidePanelMaskOn("&quotESC&quot to quit");
 
@@ -268,8 +270,10 @@ document.getElementById("create_edge_btn").addEventListener("click", function(ev
     function toggleOffStartNode(node_id) {
         start_node = null;
         let node = document.getElementById(node_id);
+        if (node === null) {
+            return;
+        }
         node.classList.remove("create_edge_start");
-        // let end_nodes = document.getElementsByClassName("create_edge_end");
         let end_nodes = adj_lists[node_id];
         for (let i = 0; i < end_nodes.length; i++) {
             let curr_node = document.getElementById(end_nodes[i]);
@@ -352,13 +356,61 @@ document.getElementById("create_edge_btn").addEventListener("click", function(ev
     document.addEventListener("keydown", keydown);
 });
 
+// The given class name will either be added (true) or removed (false) from every node
+function applyClassOnNodes(class_name, doApply) {
+    let nodes = document.getElementsByClassName("node");
+    for (let i = 0; i < nodes.length; i++) {
+        let node = nodes[i];
+        doApply ? node.classList.add(class_name) : node.classList.remove(class_name);
+    }
+}
+
+// The given function name will either be added (true) or removed (false) from every node as a click event
+function applyClickEventOnNodes(func, doApply) {
+    let nodes = document.getElementsByClassName("node");
+    for (let i = 0; i < nodes.length; i++) {
+        let node = nodes[i];
+        doApply ? node.addEventListener("click", func) : node.removeEventListener("click", func);
+    }
+}
+
 document.getElementById("delete_node_btn").addEventListener("click", function(event) {
+    // Deletes the given node ID from the adjacency list of all nodes and removes its own entry
+    // Can be later called by other methods used to delete nodes (not necessarily a click event)
+    function propagateDeleteNode(node_id) {
+        document.getElementById(node_id).remove(); // Remove the node element
+
+        // Remove existence of node in other adjacency lists and also edge elements
+        let adj_nodes = adj_lists[node_id];
+        for (let i = 0; i < adj_nodes.length; i++) {
+            let index = adj_lists[adj_nodes[i]].indexOf(node_id);
+            adj_lists[adj_nodes[i]].splice(index, 1); 
+
+            let edge_id = createEdgeID(node_id, adj_nodes[i]);
+            document.getElementById(edge_id).remove();
+        }
+        delete adj_lists[node_id];
+    }
+
+    // Defines the functionality of deleting when a node is clicked
+    function deleteOnClick(event) {
+        propagateDeleteNode(event.target.id);
+    }
+    
+    // Prep screen for delete mode
     toggleSidePanelMaskOn("&quotESC&quot to quit");
+    applyClassOnNodes("delete_node", true);
+    document.getElementById("node_info_section").style.display = "none";
+    applyClickEventOnNodes(standardNodeSelect, false);
+    applyClickEventOnNodes(deleteOnClick, true);
 
     // Listen for cancel "ESC"
     function keydown(event) {
         if (event.key === "Escape") {
             toggleSidePanelMaskOff();
+            applyClassOnNodes("delete_node", false);
+            applyClickEventOnNodes(standardNodeSelect, true);
+            applyClickEventOnNodes(deleteOnClick, false);
         }
     }
     document.addEventListener("keydown", keydown);
