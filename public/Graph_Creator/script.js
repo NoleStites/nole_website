@@ -83,6 +83,7 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
         document.getElementById("preview_section").appendChild(placed_node);
         dragElement(placed_node); // make node draggable
         adj_lists[placed_node.id] = []; // Add node to adjacency lists with default no edges
+        matrixAddNode(placed_node.id);
     }
     document.getElementById("preview_section").addEventListener("click", click);
 
@@ -375,10 +376,11 @@ function applyClickEventOnNodes(func, doApply) {
 }
 
 document.getElementById("delete_node_btn").addEventListener("click", function(event) {
-    // Deletes the given node ID from the adjacency list of all nodes and removes its own entry
+    // Deletes the given node ID from the adjacency matrix and list of all nodes and removes its own entry
     // Can be later called by other methods used to delete nodes (not necessarily a click event)
     function propagateDeleteNode(node_id) {
         document.getElementById(node_id).remove(); // Remove the node element
+        matrixRemoveNode(node_id);
 
         // Remove existence of node in other adjacency lists and also edge elements
         let adj_nodes = adj_lists[node_id];
@@ -416,7 +418,70 @@ document.getElementById("delete_node_btn").addEventListener("click", function(ev
     document.addEventListener("keydown", keydown);
 });
 
+// Given a node ID, will add an entry in the adjacency matrix with all values set to 0
+function matrixAddNode(node_id) {
+    let node_label = document.getElementById(node_id).innerHTML;
+    let matrix = document.getElementById("adj_matrix");
 
+    // Create new label and data elements
+    let new_label = document.createElement("th");
+    new_label.innerHTML = node_label;
+    let new_data = document.createElement("td");
+    new_data.innerHTML = 0;
+
+    // Add new column (label and data) at the end of every row so far
+    let rows = document.getElementsByClassName("matrix_row");
+    for (let i = 0; i < rows.length; i++) {
+        if (i === 0) { // Label row
+            rows[i].appendChild(new_label.cloneNode("deep"));
+        }
+        else {
+            rows[i].appendChild(new_data.cloneNode("deep"));
+        }
+    }
+
+    // Create the new row for this node
+    let new_row = document.createElement("tr");
+    new_row.classList.add("matrix_row");
+    new_row.id = `row_${node_id}`; // Ex: 'row_node0'
+    new_row.appendChild(new_label.cloneNode("deep"));
+    for (let i = 0; i < rows.length; i++) { // Default row values to 0
+        new_row.appendChild(new_data.cloneNode("deep"));
+    }
+    matrix.appendChild(new_row);
+}
+
+function matrixRemoveNode(node_id) {
+    let matrix = document.getElementById("adj_matrix");
+
+    // Delete row in matrix corresponding to give node ID
+
+    // Get row (and corresponding column) number of node to delete
+    let column_num;
+    let rows = document.getElementsByClassName("matrix_row");
+    for (let i = 0; i < rows.length; i++) {
+        if (rows[i].id === `row_${node_id}`) {
+            column_num = i;
+            rows[i].remove(); // Delete row 
+            break;
+        }
+    }
+
+    // Delete corresponding column in remaining rows
+    for (let i = 0; i < rows.length; i++) {
+        let row = rows[i];
+        let column = row.children[column_num];
+        column.remove();
+    }
+}
+
+function matrixEditLabel(node_id) {
+
+}
+
+function matrixEditEdge(node1_id, node2_id) {
+    return;
+}
 
 
 
