@@ -65,6 +65,7 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
     function click(event) {
         placed_node = new_node.cloneNode("deep");
         placed_node.id = `node${num_nodes}`;
+        placed_node.classList.add(`label_for_${placed_node.id}`);
         placed_node.innerHTML = num_nodes;
         num_nodes += 1;
         let top = event.layerY - node_size/2;
@@ -97,8 +98,13 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
 });
 
 // Displays, in the side panel, info for the given node
+// All elements with class 'label_for_nodeX' will be changed
 function updateLabel(event) {
-    document.getElementById(_selected_node).innerHTML = event.target.value;
+    // For all page elements with sharing a label, edit them
+    let labels = document.getElementsByClassName(`label_for_${_selected_node}`);
+    for (let i = 0; i < labels.length; i++) {
+        labels[i].innerHTML = event.target.value;
+    }
 }
 
 var _selected_node;
@@ -432,6 +438,7 @@ function matrixAddNode(node_id) {
 
     // Create new label and data elements
     let new_label = document.createElement("th");
+    new_label.classList.add(`label_for_${node_id}`);
     new_label.innerHTML = node_label;
     let new_data = document.createElement("td");
     // new_data.id = `col_${node_id}`; // Ex: 'col_num0'
