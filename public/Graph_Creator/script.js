@@ -427,6 +427,7 @@ function matrixAddNode(node_id) {
     let new_label = document.createElement("th");
     new_label.innerHTML = node_label;
     let new_data = document.createElement("td");
+    // new_data.id = `col_${node_id}`; // Ex: 'col_num0' TODO
     new_data.innerHTML = 0;
 
     // Add new column (label and data) at the end of every row so far
@@ -449,12 +450,11 @@ function matrixAddNode(node_id) {
         new_row.appendChild(new_data.cloneNode("deep"));
     }
     matrix.appendChild(new_row);
+    console.log(matrix.children['row_node0'].children);
 }
 
 function matrixRemoveNode(node_id) {
     let matrix = document.getElementById("adj_matrix");
-
-    // Delete row in matrix corresponding to give node ID
 
     // Get row (and corresponding column) number of node to delete
     let column_num;
