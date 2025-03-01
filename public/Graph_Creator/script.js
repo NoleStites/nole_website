@@ -332,12 +332,19 @@ document.getElementById("create_edge_btn").addEventListener("click", function(ev
                 edge = document.getElementById(`edge_${selected_node.id}_${start_node}`);
             }
             edge.remove();
+            matrixEditEdge(start_node, selected_node.id);
+            matrixEditEdge(selected_node.id, start_node);
         }
         else { // Add edge
             selected_node.classList.add("create_edge_end");
             adj_lists[selected_node.id].push(start_node);
             adj_lists[start_node].push(selected_node.id);
             createEdge(document.getElementById(start_node), selected_node);
+            
+            // Edit edge values in matrix 
+            // (currently programmed for undirected graphs; TODO make dynamic for other types)
+            matrixEditEdge(start_node, selected_node.id);
+            matrixEditEdge(selected_node.id, start_node);
         }
     }
 
@@ -445,7 +452,6 @@ function matrixAddNode(node_id) {
     }
 
     // Create the new row for this node
-    // rows = document.getElementsByClassName("matrix_row");
     let new_row = document.createElement("tr");
     new_row.classList.add("matrix_row");
     new_row.id = `row_${node_id}`; // Ex: 'row_node0'
@@ -464,6 +470,7 @@ function matrixAddNode(node_id) {
     matrix.appendChild(new_row);
 }
 
+// Given a node ID, will remove an entry in the adjacency matrix
 function matrixRemoveNode(node_id) {
     let matrix = document.getElementById("adj_matrix");
 
@@ -490,8 +497,14 @@ function matrixEditLabel(node_id) {
 
 }
 
+// Given the ID of node1 (start) and node2 (end), will remove the
+// edge from node1 -> node2 (order of given params matters)
+// Undirected graphs need to call this function twice, once with 
+// (node1, node2) and again with (node2, node1)
 function matrixEditEdge(node1_id, node2_id) {
-    return;
+    let cell = document.getElementById(`data_${node1_id}_${node2_id}`);
+    if (cell.innerHTML === "0") {cell.innerHTML = "1";}
+    else {cell.innerHTML = "0";}
 }
 
 
