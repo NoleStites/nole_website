@@ -427,7 +427,7 @@ function matrixAddNode(node_id) {
     let new_label = document.createElement("th");
     new_label.innerHTML = node_label;
     let new_data = document.createElement("td");
-    // new_data.id = `col_${node_id}`; // Ex: 'col_num0' TODO
+    // new_data.id = `col_${node_id}`; // Ex: 'col_num0'
     new_data.innerHTML = 0;
 
     // Add new column (label and data) at the end of every row so far
@@ -437,20 +437,31 @@ function matrixAddNode(node_id) {
             rows[i].appendChild(new_label.cloneNode("deep"));
         }
         else {
-            rows[i].appendChild(new_data.cloneNode("deep"));
+            let data_clone = new_data.cloneNode("deep");
+            let row_node = rows[i].id.slice(4); // Remove the 'row_' in 'row_nodeX'
+            data_clone.id = `data_${row_node}_${node_id}`;
+            rows[i].appendChild(data_clone);
         }
     }
 
     // Create the new row for this node
+    // rows = document.getElementsByClassName("matrix_row");
     let new_row = document.createElement("tr");
     new_row.classList.add("matrix_row");
     new_row.id = `row_${node_id}`; // Ex: 'row_node0'
     new_row.appendChild(new_label.cloneNode("deep"));
-    for (let i = 0; i < rows.length; i++) { // Default row values to 0
-        new_row.appendChild(new_data.cloneNode("deep"));
+    for (let i = 1; i < rows.length+1; i++) { // Default row values to 0
+        let data_clone = new_data.cloneNode("deep");
+        let row_node;
+        if (i < rows.length) {
+            row_node = rows[i].id.slice(4); // Remove the 'row_' in 'row_nodeX'
+        } else {
+            row_node = node_id; // The last column is an exception
+        }
+        data_clone.id = `data_${node_id}_${row_node}`;
+        new_row.appendChild(data_clone);
     }
     matrix.appendChild(new_row);
-    console.log(matrix.children['row_node0'].children);
 }
 
 function matrixRemoveNode(node_id) {
