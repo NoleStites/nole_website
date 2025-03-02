@@ -1,5 +1,6 @@
 var num_nodes = 0; // used for creating unique IDs for nodes
 var adj_lists = {}; // Maps node IDs to a list of node IDs they are connected to
+var graph_type = "undirected";
 
 const css_styles = getComputedStyle(document.documentElement); // Or any specific element
 var edge_thickness = Number(css_styles.getPropertyValue("--edge-thickness").slice(0,-2)); // px
@@ -412,25 +413,25 @@ function applyClickEventOnNodes(func, doApply) {
     }
 }
 
-document.getElementById("delete_node_btn").addEventListener("click", function(event) {
-    // Deletes the given node ID from the adjacency matrix and list of all nodes and removes its own entry
-    // Can be later called by other methods used to delete nodes (not necessarily a click event)
-    function propagateDeleteNode(node_id) {
-        document.getElementById(node_id).remove(); // Remove the node element
-        matrixRemoveNode(node_id);
+// Deletes the given node ID from the adjacency matrix and list of all nodes and removes its own entry
+// Can be later called by other methods used to delete nodes (not necessarily a click event)
+function propagateDeleteNode(node_id) {
+    document.getElementById(node_id).remove(); // Remove the node element
+    matrixRemoveNode(node_id);
 
-        // Remove existence of node in other adjacency lists and also edge elements
-        let adj_nodes = adj_lists[node_id];
-        for (let i = 0; i < adj_nodes.length; i++) {
-            let index = adj_lists[adj_nodes[i]].indexOf(node_id);
-            adj_lists[adj_nodes[i]].splice(index, 1); 
+    // Remove existence of node in other adjacency lists and also edge elements
+    let adj_nodes = adj_lists[node_id];
+    for (let i = 0; i < adj_nodes.length; i++) {
+        let index = adj_lists[adj_nodes[i]].indexOf(node_id);
+        adj_lists[adj_nodes[i]].splice(index, 1); 
 
-            let edge_id = `edge_${createMinMaxNodeID(node_id, adj_nodes[i])}`;
-            document.getElementById(edge_id).remove();
-        }
-        delete adj_lists[node_id];
+        let edge_id = `edge_${createMinMaxNodeID(node_id, adj_nodes[i])}`;
+        document.getElementById(edge_id).remove();
     }
+    delete adj_lists[node_id];
+}
 
+document.getElementById("delete_node_btn").addEventListener("click", function(event) {
     // Defines the functionality of deleting when a node is clicked
     function deleteOnClick(event) {
         propagateDeleteNode(event.target.id);
@@ -524,10 +525,6 @@ function matrixRemoveNode(node_id) {
     }
 }
 
-function matrixEditLabel(node_id) {
-
-}
-
 // Given the ID of node1 (start) and node2 (end), will remove the
 // edge from node1 -> node2 (order of given params matters)
 // Undirected graphs need to call this function twice, once with 
@@ -538,7 +535,52 @@ function matrixEditEdge(node1_id, node2_id) {
     else {cell.innerHTML = "0";}
 }
 
+// Brings up a prompt box when changing graph type and applies logic to changing it
+// will display given message as the question
+function promptUserYesNo(new_graph_type, message) {
+    document.getElementById("prompt_message").innerHTML = message;
+    document.getElementById("prompt_section").style.display = "flex";
 
+    function promptButtonClick(event) {
+        if (event.target.innerHTML === "Yes") {
+            graph_type = new_graph_type; // "undirected", "directed", ...
+
+            // Reset the screen (delete all nodes, edges, and matrix entries)
+            let node_ids = Object.keys(adj_lists);
+            for (let i = 0; i < node_ids.length; i++) {
+                propagateDeleteNode(node_ids[i]);
+            }
+            num_nodes = 0;
+            toggleInfoPanelOff();
+        }
+        else {
+            document.getElementById(`radio_${graph_type}`).checked = true; // return radios to previous state
+        }
+
+        // Remove event listeners from buttons
+        let buttons = document.getElementsByClassName("prompt_btn");
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].removeEventListener("click", promptButtonClick);
+        }
+
+        document.getElementById("prompt_section").style.display = "none";
+    }
+
+    let buttons = document.getElementsByClassName("prompt_btn");
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", promptButtonClick);
+    }
+}
+
+// What happens when the user selects a new graph type
+function changeGraphType(event) {
+    promptUserYesNo(event.target.value, "Changing graph types will delete your current graph. Are you sure that you want to continue?");
+}
+
+let graph_type_radios = document.getElementsByName("graph_type_radio");
+for (let i = 0; i < graph_type_radios.length; i++) {
+    graph_type_radios[i].addEventListener("change", changeGraphType);
+}
 
 
 
