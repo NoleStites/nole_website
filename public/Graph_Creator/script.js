@@ -1,9 +1,9 @@
 var num_nodes = 0; // used for creating unique IDs for nodes
 var adj_lists = {}; // Maps node IDs to a list of node IDs they are connected to
-var edge_thickness = 5; // px
+var graph_type = "undirected";
 
 const css_styles = getComputedStyle(document.documentElement); // Or any specific element
-var edge_thickness = css_styles.getPropertyValue("--edge-thickness").slice(0,-2); // px
+var edge_thickness = Number(css_styles.getPropertyValue("--edge-thickness").slice(0,-2)); // px
 var node_size = css_styles.getPropertyValue("--node-size").slice(0,-2); // Includes border
 var node_zIndex = Number(css_styles.getPropertyValue("--node-z-index"));
 
@@ -65,6 +65,7 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
     function click(event) {
         placed_node = new_node.cloneNode("deep");
         placed_node.id = `node${num_nodes}`;
+        placed_node.classList.add(`label_for_${placed_node.id}`);
         placed_node.innerHTML = num_nodes;
         num_nodes += 1;
         let top = event.layerY - node_size/2;
@@ -83,6 +84,7 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
         document.getElementById("preview_section").appendChild(placed_node);
         dragElement(placed_node); // make node draggable
         adj_lists[placed_node.id] = []; // Add node to adjacency lists with default no edges
+        matrixAddNode(placed_node.id);
     }
     document.getElementById("preview_section").addEventListener("click", click);
 
@@ -96,8 +98,13 @@ document.getElementById("create_node_btn").addEventListener("click", function(ev
 });
 
 // Displays, in the side panel, info for the given node
+// All elements with class 'label_for_nodeX' will be changed
 function updateLabel(event) {
-    document.getElementById(_selected_node).innerHTML = event.target.value;
+    // For all page elements with sharing a label, edit them
+    let labels = document.getElementsByClassName(`label_for_${_selected_node}`);
+    for (let i = 0; i < labels.length; i++) {
+        labels[i].innerHTML = event.target.value;
+    }
 }
 
 var _selected_node;
@@ -178,20 +185,35 @@ function dragElement(elmnt) {
   }
 }
 
+
 // Returns the distance between two points
 function calculateDistance(x1, y1, x2, y2) {
     return Math.sqrt((x2-x1)**2 + (y2-y1)**2);
 }
 
+// Will reposition the weight label between the given nodes to be centered
+function moveWeightLabel(node1, node2) {
+    let edge = document.getElementById(`edge_${createMinMaxNodeID(node1.id, node2.id)}`);
+    let edge_length = edge.offsetWidth;
+    let weight = document.getElementById(`weight_${createMinMaxNodeID(node1.id, node2.id)}`);
+    let translate_x = edge_length/2 - weight.offsetWidth/2;
+    let translate_y = weight.offsetHeight/-2 + edge_thickness/2;
+    weight.style.left = translate_x + 'px';
+    weight.style.top = translate_y + 'px';
+    let angle = Number(edge.style.transform.slice(8, -4));
+    weight.style.transform = `RotateZ(${-angle}rad)`;
+}
+
 // Will move the edge between the two given nodes (called when either node is repostioned)
 function moveEdge(node1, node2) {
     // Get the edge element
-    let edge = document.getElementById(createEdgeID(node1.id, node2.id));
+    let edge = document.getElementById(`edge_${createMinMaxNodeID(node1.id, node2.id)}`);
 
     let node1_props = node1.getBoundingClientRect();
     let node2_props = node2.getBoundingClientRect();
     let edge_length = calculateDistance(node1_props.x, node1_props.y, node2_props.x, node2_props.y);
     edge.style.width = edge_length + 'px';
+    edge.setAttribute('edgeLength', edge_length);
 
     // Calculate the center points of each given node within the preview area
     let node1_X = node1.offsetLeft + node_size/2;
@@ -218,14 +240,17 @@ function moveEdge(node1, node2) {
     edge.style.top = centerY_offset + 'px';
     edge.style.left = centerX_offset + 'px';
     edge.style.transform = `RotateZ(${angle}rad)`;
+
+    // Reposition the weight labels
+    moveWeightLabel(node1, node2);
 }
 
-// Given two node IDs (node0, node1, etc.), will an ID of the format
-// 'edge_nodeX_nodeY' such that X is the smaller node ID and Y is the larger
-function createEdgeID(node_id1, node_id2) {
+// Given two node IDs (node0, node1, etc.), will a string of the format
+// 'nodeX_nodeY' such that X is the smaller node ID and Y is the larger
+function createMinMaxNodeID(node_id1, node_id2) {
     let smallest_id = "node" + Math.min(Number(node_id1.slice(4)), Number(node_id2.slice(4)));
     let largest_id = "node" + Math.max(Number(node_id1.slice(4)), Number(node_id2.slice(4)));
-    return `edge_${smallest_id}_${largest_id}`;
+    return `${smallest_id}_${largest_id}`;
 }
 
 // Given two node elements, this function will create an edge between them
@@ -234,14 +259,21 @@ function createEdge(node1, node2) {
     // Define new edge length and thickness and fetch node sizes
     let node1_props = node1.getBoundingClientRect();
     let node2_props = node2.getBoundingClientRect();
-    let edge_length = calculateDistance(node1_props.x, node1_props.y, node2_props.x, node2_props.y);
 
     // Create the new edge (div) element
     let preview_box = document.getElementById("preview_section");
     let new_edge = document.createElement("div");
     new_edge.classList.add("edge");
     // Create id with smallest node listed first
-    new_edge.id = createEdgeID(node1.id, node2.id);
+    new_edge.id = `edge_${createMinMaxNodeID(node1.id, node2.id)}`;
+
+    // Create weight label
+    let weight = document.createElement("div");
+    weight.classList.add("weight_label");
+    weight.id = `weight_${createMinMaxNodeID(node1.id, node2.id)}`; // Ex: 'weight_node0_node1'
+    weight.innerHTML = "0.12";
+    new_edge.appendChild(weight);
+
     preview_box.appendChild(new_edge);
     
     // Size, translate,  and rotate edge to fit between nodes
@@ -281,7 +313,7 @@ document.getElementById("create_edge_btn").addEventListener("click", function(ev
         }
     }
 
-    // Sets the given noed as the start of all created edges and highlights endpoints (all nodes toggleable)
+    // Sets the given node as the start of all created edges and highlights endpoints (all nodes toggleable)
     function toggleOnStartNode(node_id) {
         start_node = node_id;
         let node = document.getElementById(node_id);
@@ -331,12 +363,19 @@ document.getElementById("create_edge_btn").addEventListener("click", function(ev
                 edge = document.getElementById(`edge_${selected_node.id}_${start_node}`);
             }
             edge.remove();
+            matrixEditEdge(start_node, selected_node.id);
+            matrixEditEdge(selected_node.id, start_node);
         }
         else { // Add edge
             selected_node.classList.add("create_edge_end");
             adj_lists[selected_node.id].push(start_node);
             adj_lists[start_node].push(selected_node.id);
             createEdge(document.getElementById(start_node), selected_node);
+            
+            // Edit edge values in matrix 
+            // (currently programmed for undirected graphs; TODO make dynamic for other types)
+            matrixEditEdge(start_node, selected_node.id);
+            matrixEditEdge(selected_node.id, start_node);
         }
     }
 
@@ -374,24 +413,25 @@ function applyClickEventOnNodes(func, doApply) {
     }
 }
 
-document.getElementById("delete_node_btn").addEventListener("click", function(event) {
-    // Deletes the given node ID from the adjacency list of all nodes and removes its own entry
-    // Can be later called by other methods used to delete nodes (not necessarily a click event)
-    function propagateDeleteNode(node_id) {
-        document.getElementById(node_id).remove(); // Remove the node element
+// Deletes the given node ID from the adjacency matrix and list of all nodes and removes its own entry
+// Can be later called by other methods used to delete nodes (not necessarily a click event)
+function propagateDeleteNode(node_id) {
+    document.getElementById(node_id).remove(); // Remove the node element
+    matrixRemoveNode(node_id);
 
-        // Remove existence of node in other adjacency lists and also edge elements
-        let adj_nodes = adj_lists[node_id];
-        for (let i = 0; i < adj_nodes.length; i++) {
-            let index = adj_lists[adj_nodes[i]].indexOf(node_id);
-            adj_lists[adj_nodes[i]].splice(index, 1); 
+    // Remove existence of node in other adjacency lists and also edge elements
+    let adj_nodes = adj_lists[node_id];
+    for (let i = 0; i < adj_nodes.length; i++) {
+        let index = adj_lists[adj_nodes[i]].indexOf(node_id);
+        adj_lists[adj_nodes[i]].splice(index, 1); 
 
-            let edge_id = createEdgeID(node_id, adj_nodes[i]);
-            document.getElementById(edge_id).remove();
-        }
-        delete adj_lists[node_id];
+        let edge_id = `edge_${createMinMaxNodeID(node_id, adj_nodes[i])}`;
+        document.getElementById(edge_id).remove();
     }
+    delete adj_lists[node_id];
+}
 
+document.getElementById("delete_node_btn").addEventListener("click", function(event) {
     // Defines the functionality of deleting when a node is clicked
     function deleteOnClick(event) {
         propagateDeleteNode(event.target.id);
@@ -416,11 +456,131 @@ document.getElementById("delete_node_btn").addEventListener("click", function(ev
     document.addEventListener("keydown", keydown);
 });
 
+// Given a node ID, will add an entry in the adjacency matrix with all values set to 0
+function matrixAddNode(node_id) {
+    let node_label = document.getElementById(node_id).innerHTML;
+    let matrix = document.getElementById("adj_matrix");
 
+    // Create new label and data elements
+    let new_label = document.createElement("th");
+    new_label.classList.add(`label_for_${node_id}`);
+    new_label.innerHTML = node_label;
+    let new_data = document.createElement("td");
+    // new_data.id = `col_${node_id}`; // Ex: 'col_num0'
+    new_data.innerHTML = 0;
 
+    // Add new column (label and data) at the end of every row so far
+    let rows = document.getElementsByClassName("matrix_row");
+    for (let i = 0; i < rows.length; i++) {
+        if (i === 0) { // Label row
+            rows[i].appendChild(new_label.cloneNode("deep"));
+        }
+        else {
+            let data_clone = new_data.cloneNode("deep");
+            let row_node = rows[i].id.slice(4); // Remove the 'row_' in 'row_nodeX'
+            data_clone.id = `data_${row_node}_${node_id}`;
+            rows[i].appendChild(data_clone);
+        }
+    }
 
+    // Create the new row for this node
+    let new_row = document.createElement("tr");
+    new_row.classList.add("matrix_row");
+    new_row.id = `row_${node_id}`; // Ex: 'row_node0'
+    new_row.appendChild(new_label.cloneNode("deep"));
+    for (let i = 1; i < rows.length+1; i++) { // Default row values to 0
+        let data_clone = new_data.cloneNode("deep");
+        let row_node;
+        if (i < rows.length) {
+            row_node = rows[i].id.slice(4); // Remove the 'row_' in 'row_nodeX'
+        } else {
+            row_node = node_id; // The last column is an exception
+        }
+        data_clone.id = `data_${node_id}_${row_node}`;
+        new_row.appendChild(data_clone);
+    }
+    matrix.appendChild(new_row);
+}
 
+// Given a node ID, will remove an entry in the adjacency matrix
+function matrixRemoveNode(node_id) {
+    let matrix = document.getElementById("adj_matrix");
 
+    // Get row (and corresponding column) number of node to delete
+    let column_num;
+    let rows = document.getElementsByClassName("matrix_row");
+    for (let i = 0; i < rows.length; i++) {
+        if (rows[i].id === `row_${node_id}`) {
+            column_num = i;
+            rows[i].remove(); // Delete row 
+            break;
+        }
+    }
+
+    // Delete corresponding column in remaining rows
+    for (let i = 0; i < rows.length; i++) {
+        let row = rows[i];
+        let column = row.children[column_num];
+        column.remove();
+    }
+}
+
+// Given the ID of node1 (start) and node2 (end), will remove the
+// edge from node1 -> node2 (order of given params matters)
+// Undirected graphs need to call this function twice, once with 
+// (node1, node2) and again with (node2, node1)
+function matrixEditEdge(node1_id, node2_id) {
+    let cell = document.getElementById(`data_${node1_id}_${node2_id}`);
+    if (cell.innerHTML === "0") {cell.innerHTML = "1";}
+    else {cell.innerHTML = "0";}
+}
+
+// Brings up a prompt box when changing graph type and applies logic to changing it
+// will display given message as the question
+function promptUserYesNo(new_graph_type, message) {
+    document.getElementById("prompt_message").innerHTML = message;
+    document.getElementById("prompt_section").style.display = "flex";
+
+    function promptButtonClick(event) {
+        if (event.target.innerHTML === "Yes") {
+            graph_type = new_graph_type; // "undirected", "directed", ...
+
+            // Reset the screen (delete all nodes, edges, and matrix entries)
+            let node_ids = Object.keys(adj_lists);
+            for (let i = 0; i < node_ids.length; i++) {
+                propagateDeleteNode(node_ids[i]);
+            }
+            num_nodes = 0;
+            toggleInfoPanelOff();
+        }
+        else {
+            document.getElementById(`radio_${graph_type}`).checked = true; // return radios to previous state
+        }
+
+        // Remove event listeners from buttons
+        let buttons = document.getElementsByClassName("prompt_btn");
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].removeEventListener("click", promptButtonClick);
+        }
+
+        document.getElementById("prompt_section").style.display = "none";
+    }
+
+    let buttons = document.getElementsByClassName("prompt_btn");
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", promptButtonClick);
+    }
+}
+
+// What happens when the user selects a new graph type
+function changeGraphType(event) {
+    promptUserYesNo(event.target.value, "Changing graph types will delete your current graph. Are you sure that you want to continue?");
+}
+
+let graph_type_radios = document.getElementsByName("graph_type_radio");
+for (let i = 0; i < graph_type_radios.length; i++) {
+    graph_type_radios[i].addEventListener("change", changeGraphType);
+}
 
 
 
