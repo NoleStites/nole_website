@@ -1,9 +1,8 @@
 var num_nodes = 0; // used for creating unique IDs for nodes
 var adj_lists = {}; // Maps node IDs to a list of node IDs they are connected to
-var edge_thickness = 5; // px
 
 const css_styles = getComputedStyle(document.documentElement); // Or any specific element
-var edge_thickness = css_styles.getPropertyValue("--edge-thickness").slice(0,-2); // px
+var edge_thickness = Number(css_styles.getPropertyValue("--edge-thickness").slice(0,-2)); // px
 var node_size = css_styles.getPropertyValue("--node-size").slice(0,-2); // Includes border
 var node_zIndex = Number(css_styles.getPropertyValue("--node-z-index"));
 
@@ -185,9 +184,24 @@ function dragElement(elmnt) {
   }
 }
 
+
 // Returns the distance between two points
 function calculateDistance(x1, y1, x2, y2) {
     return Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+}
+
+// Will reposition the weight label between the given nodes to be centered
+function moveWeightLabel(node1, node2) {
+    let edge = document.getElementById(createEdgeID(node1.id, node2.id));
+    let edge_length = edge.offsetWidth;
+    let weight = document.getElementById(`weight_${node1.id}_${node2.id}`);
+    let translate_x = edge_length/2 - weight.offsetWidth/2;
+    let translate_y = weight.offsetHeight/-2 + edge_thickness/2;
+    weight.style.left = translate_x + 'px';
+    weight.style.top = translate_y + 'px';
+    let angle = Number(edge.style.transform.slice(8, -4));
+    weight.style.transform = `RotateZ(${-angle}rad)`;
+    // console.log(edge.style.transform, "|", angle);
 }
 
 // Will move the edge between the two given nodes (called when either node is repostioned)
@@ -199,6 +213,7 @@ function moveEdge(node1, node2) {
     let node2_props = node2.getBoundingClientRect();
     let edge_length = calculateDistance(node1_props.x, node1_props.y, node2_props.x, node2_props.y);
     edge.style.width = edge_length + 'px';
+    edge.setAttribute('edgeLength', edge_length);
 
     // Calculate the center points of each given node within the preview area
     let node1_X = node1.offsetLeft + node_size/2;
@@ -225,6 +240,9 @@ function moveEdge(node1, node2) {
     edge.style.top = centerY_offset + 'px';
     edge.style.left = centerX_offset + 'px';
     edge.style.transform = `RotateZ(${angle}rad)`;
+
+    // Reposition the weight labels
+    moveWeightLabel(node1, node2);
 }
 
 // Given two node IDs (node0, node1, etc.), will an ID of the format
@@ -241,7 +259,6 @@ function createEdge(node1, node2) {
     // Define new edge length and thickness and fetch node sizes
     let node1_props = node1.getBoundingClientRect();
     let node2_props = node2.getBoundingClientRect();
-    let edge_length = calculateDistance(node1_props.x, node1_props.y, node2_props.x, node2_props.y);
 
     // Create the new edge (div) element
     let preview_box = document.getElementById("preview_section");
@@ -249,6 +266,14 @@ function createEdge(node1, node2) {
     new_edge.classList.add("edge");
     // Create id with smallest node listed first
     new_edge.id = createEdgeID(node1.id, node2.id);
+
+    // Create weight label
+    let weight = document.createElement("div");
+    weight.classList.add("weight_label");
+    weight.id = `weight_${node1.id}_${node2.id}`; // Ex: 'weight_node0_node1'
+    weight.innerHTML = "0.12";
+    new_edge.appendChild(weight);
+
     preview_box.appendChild(new_edge);
     
     // Size, translate,  and rotate edge to fit between nodes
@@ -288,7 +313,7 @@ document.getElementById("create_edge_btn").addEventListener("click", function(ev
         }
     }
 
-    // Sets the given noed as the start of all created edges and highlights endpoints (all nodes toggleable)
+    // Sets the given node as the start of all created edges and highlights endpoints (all nodes toggleable)
     function toggleOnStartNode(node_id) {
         start_node = node_id;
         let node = document.getElementById(node_id);
@@ -514,7 +539,23 @@ function matrixEditEdge(node1_id, node2_id) {
     else {cell.innerHTML = "0";}
 }
 
-
+function temp() {
+    let weight = document.createElement("div");
+    weight.classList.add("weight_label");
+    weight.innerHTML = "0.12";
+    let edge = document.getElementById("edge_node0_node1");
+    let edge_length = edge.getAttribute("edgeLength");
+    // console.log(edge.getBoundingClientRect());
+    // console.log(edge.getAttribute("edgeLength"));
+    edge.appendChild(weight);
+    let weight_props = weight.getBoundingClientRect();
+    let translate_x = edge_length/2 - weight_props.width/2;
+    let translate_y = weight_props.height/-2 + edge_thickness/2;
+    // weight.style.translate = `${translate_x}px ${translate_y}px`;
+    // weight.style.translate = `${translate_x}px 0px`;
+    weight.style.left = translate_x + 'px';
+    weight.style.top = translate_y + 'px';
+}
 
 
 
