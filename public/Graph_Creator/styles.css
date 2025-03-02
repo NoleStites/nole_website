@@ -135,8 +135,8 @@ td {
 .node {
     width: var(--node-size);
     aspect-ratio: 1/1;
-    background-color: lightblue;
-    border: 2px solid navy;
+    background-color: rgb(231, 186, 231);
+    border: 2px solid var(--edge-color);
     border-radius: 50%;
     position: absolute;
     z-index: var(--node-z-index);
@@ -157,7 +157,7 @@ td {
     background-color: var(--edge-color);
     position: absolute;
     height: var(--edge-thickness);
-    z-index: 4;
+    z-index: 2;
     transform-origin: center;
 }
 .edge:hover {
@@ -187,5 +187,6 @@ td {
     height: fit-content;
     font-size: 20pt;
     position: absolute;
-    z-index: 5;
+    z-index: 3;
+    border-radius: 3px;
 }

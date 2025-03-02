@@ -192,22 +192,21 @@ function calculateDistance(x1, y1, x2, y2) {
 
 // Will reposition the weight label between the given nodes to be centered
 function moveWeightLabel(node1, node2) {
-    let edge = document.getElementById(createEdgeID(node1.id, node2.id));
+    let edge = document.getElementById(`edge_${createMinMaxNodeID(node1.id, node2.id)}`);
     let edge_length = edge.offsetWidth;
-    let weight = document.getElementById(`weight_${node1.id}_${node2.id}`);
+    let weight = document.getElementById(`weight_${createMinMaxNodeID(node1.id, node2.id)}`);
     let translate_x = edge_length/2 - weight.offsetWidth/2;
     let translate_y = weight.offsetHeight/-2 + edge_thickness/2;
     weight.style.left = translate_x + 'px';
     weight.style.top = translate_y + 'px';
     let angle = Number(edge.style.transform.slice(8, -4));
     weight.style.transform = `RotateZ(${-angle}rad)`;
-    // console.log(edge.style.transform, "|", angle);
 }
 
 // Will move the edge between the two given nodes (called when either node is repostioned)
 function moveEdge(node1, node2) {
     // Get the edge element
-    let edge = document.getElementById(createEdgeID(node1.id, node2.id));
+    let edge = document.getElementById(`edge_${createMinMaxNodeID(node1.id, node2.id)}`);
 
     let node1_props = node1.getBoundingClientRect();
     let node2_props = node2.getBoundingClientRect();
@@ -245,12 +244,12 @@ function moveEdge(node1, node2) {
     moveWeightLabel(node1, node2);
 }
 
-// Given two node IDs (node0, node1, etc.), will an ID of the format
-// 'edge_nodeX_nodeY' such that X is the smaller node ID and Y is the larger
-function createEdgeID(node_id1, node_id2) {
+// Given two node IDs (node0, node1, etc.), will a string of the format
+// 'nodeX_nodeY' such that X is the smaller node ID and Y is the larger
+function createMinMaxNodeID(node_id1, node_id2) {
     let smallest_id = "node" + Math.min(Number(node_id1.slice(4)), Number(node_id2.slice(4)));
     let largest_id = "node" + Math.max(Number(node_id1.slice(4)), Number(node_id2.slice(4)));
-    return `edge_${smallest_id}_${largest_id}`;
+    return `${smallest_id}_${largest_id}`;
 }
 
 // Given two node elements, this function will create an edge between them
@@ -265,12 +264,12 @@ function createEdge(node1, node2) {
     let new_edge = document.createElement("div");
     new_edge.classList.add("edge");
     // Create id with smallest node listed first
-    new_edge.id = createEdgeID(node1.id, node2.id);
+    new_edge.id = `edge_${createMinMaxNodeID(node1.id, node2.id)}`;
 
     // Create weight label
     let weight = document.createElement("div");
     weight.classList.add("weight_label");
-    weight.id = `weight_${node1.id}_${node2.id}`; // Ex: 'weight_node0_node1'
+    weight.id = `weight_${createMinMaxNodeID(node1.id, node2.id)}`; // Ex: 'weight_node0_node1'
     weight.innerHTML = "0.12";
     new_edge.appendChild(weight);
 
@@ -426,7 +425,7 @@ document.getElementById("delete_node_btn").addEventListener("click", function(ev
             let index = adj_lists[adj_nodes[i]].indexOf(node_id);
             adj_lists[adj_nodes[i]].splice(index, 1); 
 
-            let edge_id = createEdgeID(node_id, adj_nodes[i]);
+            let edge_id = `edge_${createMinMaxNodeID(node_id, adj_nodes[i])}`;
             document.getElementById(edge_id).remove();
         }
         delete adj_lists[node_id];
@@ -537,24 +536,6 @@ function matrixEditEdge(node1_id, node2_id) {
     let cell = document.getElementById(`data_${node1_id}_${node2_id}`);
     if (cell.innerHTML === "0") {cell.innerHTML = "1";}
     else {cell.innerHTML = "0";}
-}
-
-function temp() {
-    let weight = document.createElement("div");
-    weight.classList.add("weight_label");
-    weight.innerHTML = "0.12";
-    let edge = document.getElementById("edge_node0_node1");
-    let edge_length = edge.getAttribute("edgeLength");
-    // console.log(edge.getBoundingClientRect());
-    // console.log(edge.getAttribute("edgeLength"));
-    edge.appendChild(weight);
-    let weight_props = weight.getBoundingClientRect();
-    let translate_x = edge_length/2 - weight_props.width/2;
-    let translate_y = weight_props.height/-2 + edge_thickness/2;
-    // weight.style.translate = `${translate_x}px ${translate_y}px`;
-    // weight.style.translate = `${translate_x}px 0px`;
-    weight.style.left = translate_x + 'px';
-    weight.style.top = translate_y + 'px';
 }
 
 
