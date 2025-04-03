@@ -108,7 +108,7 @@ body {
 
 #texture_size_input {
     height: 30px;
-    width: 40px;
+    width: fit-content;
     font-size: 12pt;
     border-radius: 10px;   
     text-align: center;

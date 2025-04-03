@@ -64,9 +64,7 @@ function make_flex_grid(columns, rows, texture_size) {
     for (let i = 0; i < rows; i++) {
         let row = document.createElement("div");
         row.classList.add('flexbox');
-        // let row = [];
         for (let j = 0; j < columns; j++) {
-            // row.push("<div key={j} className={`texture_box diagonal_${j+i}`} style={spot_styles}></div>");
             let newDiv = document.createElement("div");
             newDiv.classList.add(`texture_box`);
             newDiv.classList.add(`diagonal_${j+i}`);
