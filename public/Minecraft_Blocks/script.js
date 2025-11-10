@@ -4,7 +4,9 @@ let num_columns = 0;
 let num_rows = 0;
 let texture_size = 0;
 let speed = 100;
-// To add new textures, create new directory in "textures" folder, fill it with images, and place the name of the new folder in the list below and you're done!
+// To add new textures:
+// 1. create new directory in "textures" folder, fill it with images, and place the name of the new folder in the list below
+// 2. Move "generate_manifest.js" file to root of project and run "node generate_manifest.js" to generate a new manifest
 const texture_types = ['animal', 'building', 'ore', 'plant', 'redstone', 'sediment', 'stone', 'utility', 'wood'];
 let textures = {};
 let selections = [];
@@ -16,28 +18,45 @@ window.onload = function() {
     document.getElementById("texture_size_input").value = texture_size;
     document.getElementById("speed_input").value = 100;
     make_flex_grid(num_columns, num_rows, texture_size);
-    fetchTexturesFromServer();
+    // fetchTexturesFromServer();
+    fetchTextures();
     // Refer to the bottom of 'fetchTexturesFromServer()' for the rest of the ToDos
 }
 
-function fetchTexturesFromServer() {
-    const fetchPromises = texture_types.map((subdir) => {
-      return fetch(`/api/files/${subdir}`)
-        .then((response) => response.json())
-        .then((files) => ({ subdir, files }))
-        .catch((error) => {
-          console.error(`Error fetching files from ${subdir}:`, error);
-          return { subdir, files: [] }; // Handle error gracefully
-        });
-    });
+// function fetchTexturesFromServer() {
+//     const fetchPromises = texture_types.map((subdir) => {
+//       return fetch(`/api/files/${subdir}`)
+//         .then((response) => response.json())
+//         .then((files) => ({ subdir, files }))
+//         .catch((error) => {
+//           console.error(`Error fetching files from ${subdir}:`, error);
+//           return { subdir, files: [] }; // Handle error gracefully
+//         });
+//     });
   
-    Promise.all(fetchPromises).then((results) => {
-      results.forEach(({ subdir, files }) => {
-        textures[subdir] = files;
-      });
-      // ToDo after textures are fetched
-      make_grids(texture_types);
+//     Promise.all(fetchPromises).then((results) => {
+//       results.forEach(({ subdir, files }) => {
+//         textures[subdir] = files;
+//       });
+//       // ToDo after textures are fetched
+//       make_grids(texture_types);
+//     });
+// }
+
+async function fetchTextures() {
+  try {
+    const response = await fetch("./textures/manifest.json");
+    const manifest = await response.json();
+
+    texture_types.forEach((type) => {
+      textures[type] = manifest[type] || [];
     });
+
+    // Do something with the textures once loaded
+    make_grids(texture_types);
+  } catch (err) {
+    console.error("Failed to fetch texture manifest:", err);
+  }
 }
 
 function initialize_vars() {
@@ -194,7 +213,6 @@ function make_texture_grid(texture_type) {
         new_texture.classList.add(texture_type);
         new_texture.id = curr_t[i]; // file name is ID
         new_texture.style.backgroundImage = `url('textures/${texture_type}/${curr_t[i]}')`;
-        console.log(new_texture.style.backgroundImage);
 
         // Insert invisible checkbox into new texture div
         let check = document.createElement("input");

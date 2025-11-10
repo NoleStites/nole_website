@@ -1,5 +1,3 @@
-// require('dotenv').config() // Imports all of our environment variables in the '.env' file
-
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -31,10 +29,6 @@ app.get('/api/files/:subdir', (req, res) => {
     res.json(files); // Send the list of files in the subdirectory
   });
 });
-
-app.use(express.json());
-const employeeRoute = require("./routes/employeeRoute");
-app.use('/employeeRoute', employeeRoute);
 
 // Start the server
 app.listen(PORT, () => {
