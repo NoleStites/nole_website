@@ -1,4 +1,4 @@
-require('dotenv').config() // Imports all of our environment variables in the '.env' file
+// require('dotenv').config() // Imports all of our environment variables in the '.env' file
 
 const express = require('express');
 const path = require('path');
